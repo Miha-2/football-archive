@@ -404,6 +404,7 @@ canvas#drawCanvas{position:absolute;inset:0;width:100%;height:100%;touch-action:
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 <script>
 let drills=[],currentId=null,editingId=null,activeFilter='';
 let currentTool='pen',currentColor='#001e40';
@@ -608,116 +609,90 @@ function renderView(d){
 function goLibrary(){renderLibrary();showScreen('library');}
 function exportPDF(){const d=drills.find(x=>x.id===currentId);if(d)doExportPDF(d);}
 
-function doExportPDF(d){
+async function doExportPDF(d){
+  const{jsPDF}=window.jspdf;
+
+  // Build off-screen HTML page for rendering
+  const W=794,M=40; // A4 width in px @96dpi approx, margin
+  const CW=W-M*2;
+
+  const diagH=d.diagram&&d.diagram.length>100
+    ? Math.round(CW*(3/4)) // 4:3 aspect ratio
+    : 120;
+
+  const sections=[
+    ['POTEK VAJE', d.potek],
+    ['COACHING POINTS', d.coaching],
+    ['VARIACIJE', d.variacije],
+    ['NASVETI', d.nasveti],
+  ].filter(([,v])=>v).map(([lbl,val])=>`
+    <div style="margin-bottom:18px">
+      <div style="font-size:9px;font-weight:700;letter-spacing:.1em;color:#6478a0;margin-bottom:5px;font-family:Arial,sans-serif">${lbl}</div>
+      <div style="font-size:13px;color:#1a1c1e;line-height:1.7;white-space:pre-wrap;font-family:Arial,sans-serif">${val}</div>
+    </div>`).join('');
+
+  const metaParts=[];
+  if(d.skupina) metaParts.push(`<span>👥 ${d.skupina}</span>`);
+  if(d.datum) metaParts.push(`<span>📅 ${d.datum}</span>`);
+  if(d.igralci) metaParts.push(`<span>🔢 ${d.igralci}</span>`);
+
+  const html=`<div style="width:${W}px;background:white;padding:${M}px;box-sizing:border-box;font-family:Arial,sans-serif">
+    <!-- header -->
+    <div style="background:#eaf0f8;border-radius:8px;padding:16px 20px;margin-bottom:16px;display:flex;justify-content:space-between;align-items:flex-start">
+      <div>
+        <div style="font-size:8px;font-weight:700;letter-spacing:.1em;color:#6478a0;margin-bottom:4px">IME VAJE</div>
+        <div style="font-size:20px;font-weight:700;color:#001e40">${d.ime||''}</div>
+      </div>
+      ${d.kategorija?`<div style="background:#94f990;color:#002204;padding:4px 12px;border-radius:999px;font-size:11px;font-weight:700;white-space:nowrap">${d.kategorija}</div>`:''}
+    </div>
+    <!-- teme -->
+    ${d.teme?`<div style="margin-bottom:14px;display:flex;gap:8px;flex-wrap:wrap">${d.teme.split(',').map(t=>`<span style="background:#e8edf5;color:#3d5a78;padding:4px 12px;border-radius:999px;font-size:11px;font-weight:600">${t.trim()}</span>`).join('')}</div>`:''}
+    <!-- diagram -->
+    ${d.diagram&&d.diagram.length>100
+      ?`<img src="${d.diagram}" style="width:${CW}px;height:${diagH}px;object-fit:cover;border-radius:8px;display:block;margin-bottom:20px">`
+      :`<div style="width:${CW}px;height:${diagH}px;background:#eaf0f8;border-radius:8px;margin-bottom:20px;display:flex;align-items:center;justify-content:center;color:#aab;font-size:13px">Ni diagrama</div>`}
+    <!-- sections -->
+    ${sections}
+    <!-- meta footer -->
+    ${metaParts.length?`<div style="margin-top:24px;padding-top:12px;border-top:1px solid #e8edf5;display:flex;gap:20px;color:#9aaabb;font-size:11px">${metaParts.join('')}</div>`:''}
+    <!-- footer -->
+    <div style="margin-top:16px;text-align:center;font-size:9px;color:#c0c8d8">Miha Perpar</div>
+  </div>`;
+
+  const el=document.createElement('div');
+  el.style.cssText='position:fixed;left:-9999px;top:0;z-index:-1';
+  el.innerHTML=html;
+  document.body.appendChild(el);
+
   try{
-    const{jsPDF}=window.jspdf;
-    const pdf=new jsPDF({orientation:'portrait',unit:'mm',format:'a5'});
-    const W=148,H=210,M=10;
-    const CW=W-M*2; // content width = 128mm
-    // Colors — light, readable
-    const navy=[0,30,64];
-    const headerBg=[235,242,250];  // very light blue-grey
-    const metaBg=[245,247,250];    // near-white
-    const labelCol=[100,120,145];  // muted blue-grey for labels
-    const textCol=[30,35,40];      // near-black for body
-    const titleCol=[0,30,64];      // navy for headings
-
-    // Helper: section label + body text block
-    function sectionBlock(label,text,yPos,maxW){
-      pdf.setFontSize(7);pdf.setFont(undefined,'bold');pdf.setTextColor(...labelCol);
-      pdf.text(label.toUpperCase(),M,yPos);
-      pdf.setFontSize(10);pdf.setFont(undefined,'normal');pdf.setTextColor(...textCol);
-      const lines=pdf.splitTextToSize(text||'—',maxW);
-      pdf.text(lines,M,yPos+5);
-      return yPos+5+lines.length*5.5;
+    const cvs=await html2canvas(el.firstElementChild,{scale:2,useCORS:true,backgroundColor:'#ffffff'});
+    const imgData=cvs.toDataURL('image/jpeg',0.92);
+    const pdf=new jsPDF({orientation:'portrait',unit:'pt',format:'a4'});
+    const pW=pdf.internal.pageSize.getWidth();
+    const pH=pdf.internal.pageSize.getHeight();
+    const ratio=cvs.height/cvs.width;
+    const iW=pW, iH=pW*ratio;
+    if(iH<=pH){
+      pdf.addImage(imgData,'JPEG',0,0,iW,iH);
+    } else {
+      // multi-page: slice canvas into A4-height chunks
+      const sliceH=Math.floor(cvs.width*ratio*(pH/iH));
+      let sy=0;
+      while(sy<cvs.height){
+        const slice=document.createElement('canvas');
+        slice.width=cvs.width;
+        slice.height=Math.min(sliceH,cvs.height-sy);
+        slice.getContext('2d').drawImage(cvs,0,sy,cvs.width,slice.height,0,0,cvs.width,slice.height);
+        const sd=slice.toDataURL('image/jpeg',0.92);
+        if(sy>0)pdf.addPage();
+        pdf.addImage(sd,'JPEG',0,0,pW,pW*(slice.height/cvs.width));
+        sy+=sliceH;
+      }
     }
-
-    // ── PAGE 1 ──────────────────────────────────────────
-    // Header: light blue-grey bar, navy text
-    pdf.setFillColor(...headerBg);
-    pdf.roundedRect(M,M,CW,20,2,2,'F');
-    // Ime vaje (left, takes ~75%)
-    const skupW=28;
-    const imeW=CW-skupW-3;
-    pdf.setFontSize(7);pdf.setFont(undefined,'bold');pdf.setTextColor(...labelCol);
-    pdf.text('IME VAJE',M+3,M+5.5);
-    pdf.setFontSize(12);pdf.setFont(undefined,'bold');pdf.setTextColor(...titleCol);
-    const imeTxt=pdf.splitTextToSize(d.ime||'',imeW-6);
-    pdf.text(imeTxt[0]||'',M+3,M+13);
-    // Skupina (right, narrow box)
-    pdf.setFillColor(220,232,245);
-    pdf.roundedRect(M+imeW+3,M,skupW,20,2,2,'F');
-    pdf.setFontSize(6);pdf.setFont(undefined,'bold');pdf.setTextColor(...labelCol);
-    pdf.text('SKUPINA',M+imeW+5,M+5.5);
-    pdf.setFontSize(11);pdf.setFont(undefined,'bold');pdf.setTextColor(...titleCol);
-    pdf.text(d.skupina||'',M+imeW+5,M+13);
-
-    let y=M+25;
-
-    // Kategorija + Ključne teme — two light boxes side by side
-    const katW=Math.round(CW*0.38), temeW=CW-katW-3;
-    pdf.setFillColor(...metaBg);
-    pdf.roundedRect(M,y,katW,13,2,2,'F');
-    pdf.roundedRect(M+katW+3,y,temeW,13,2,2,'F');
-    pdf.setFontSize(6.5);pdf.setFont(undefined,'bold');pdf.setTextColor(...labelCol);
-    pdf.text('KATEGORIJA',M+3,y+4.5);
-    pdf.text('KLJUČNE TEME',M+katW+6,y+4.5);
-    pdf.setFontSize(9);pdf.setFont(undefined,'normal');pdf.setTextColor(...textCol);
-    pdf.text(d.kategorija||'—',M+3,y+10);
-    pdf.text(pdf.splitTextToSize(d.teme||'—',temeW-6)[0],M+katW+6,y+10);
-    y+=17;
-
-    // Diagram label
-    pdf.setFontSize(7);pdf.setFont(undefined,'bold');pdf.setTextColor(...labelCol);
-    pdf.text('DIAGRAM',M,y+4);
-    y+=7;
-
-    // Diagram box — taller, light background
-    const dH=72;
-    pdf.setFillColor(250,251,253);pdf.setDrawColor(210,218,228);pdf.setLineWidth(0.3);
-    pdf.roundedRect(M,y,CW,dH,2,2,'FD');
-    if(d.diagram&&d.diagram.length>100){
-      try{pdf.addImage(d.diagram,'PNG',M+1,y+1,CW-2,dH-2);}catch(e){}
-    }
-    y+=dH+6;
-
-    // Potek vaje
-    pdf.setFontSize(7);pdf.setFont(undefined,'bold');pdf.setTextColor(...labelCol);
-    pdf.text('POTEK VAJE',M,y);y+=5;
-    pdf.setFontSize(10);pdf.setFont(undefined,'normal');pdf.setTextColor(...textCol);
-    pdf.setLineHeightFactor(1.5);
-    const potekLines=pdf.splitTextToSize(d.potek||'—',CW);
-    pdf.text(potekLines,M,y);
-
-    // ── PAGE 2 ──────────────────────────────────────────
-    pdf.addPage();
-    y=M;
-
-    // Datum + Igralci
-    const hw=(CW-3)/2;
-    pdf.setFillColor(...metaBg);
-    pdf.roundedRect(M,y,hw,13,2,2,'F');
-    pdf.roundedRect(M+hw+3,y,hw,13,2,2,'F');
-    pdf.setFontSize(6.5);pdf.setFont(undefined,'bold');pdf.setTextColor(...labelCol);
-    pdf.text('DATUM NASTANKA',M+3,y+4.5);
-    pdf.text('ŠTEVILO IGRALCEV',M+hw+6,y+4.5);
-    pdf.setFontSize(9);pdf.setFont(undefined,'normal');pdf.setTextColor(...textCol);
-    pdf.text(d.datum||'—',M+3,y+10);
-    pdf.text(d.igralci||'—',M+hw+6,y+10);
-    y+=20;
-
-    // Coaching, Variacije, Nasveti
-    pdf.setLineHeightFactor(1.5);
-    [['Coaching points',d.coaching],['Variacije',d.variacije],['Nasveti',d.nasveti]].forEach(([lbl,val])=>{
-      y=sectionBlock(lbl,val,y,CW)+5;
-    });
-
-    // Footer
-    pdf.setFontSize(7.5);pdf.setTextColor(180,185,195);
-    pdf.text('Miha Perpar',W/2,H-6,{align:'center'});
-
     pdf.save((d.ime||'vaja').replace(/\s+/g,'_')+'.pdf');
-  }catch(e){alert('PDF napaka: '+e.message);}
+  } finally {
+    document.body.removeChild(el);
+  }
 }
 
 function applyViewport(){
