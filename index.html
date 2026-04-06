@@ -123,9 +123,35 @@ canvas#drawCanvas{position:absolute;inset:0;width:100%;height:100%;touch-action:
 .detail-diagram-empty span{color:rgba(255,255,255,.3);font-size:12px;font-weight:600;letter-spacing:.12em;text-transform:uppercase;font-family:'Inter',sans-serif;position:relative}
 .detail-export-btn{margin:4px 16px 24px;width:calc(100% - 32px);padding:16px;border-radius:14px;background:#94f990;color:#002204;border:none;font-family:'Manrope',sans-serif;font-size:15px;font-weight:700;cursor:pointer;letter-spacing:-.01em}
 .export-btn-green{display:flex;align-items:center;gap:8px;background:#94f990;color:#002204;padding:9px 18px;border-radius:999px;font-size:13px;font-weight:700;cursor:pointer;border:none;font-family:'Inter',sans-serif}
+/* login */
+.login-wrap{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:100dvh;padding:32px 24px;background:#f9f9fc}
+.login-box{width:100%;max-width:360px;display:flex;flex-direction:column;gap:16px}
+.login-logo{font-family:'Manrope',sans-serif;font-size:28px;font-weight:800;color:#001e40;letter-spacing:-.03em;text-align:center;margin-bottom:8px}
+.login-sub{font-size:14px;color:#737780;text-align:center;margin-top:-8px;margin-bottom:8px}
+.login-input{padding:16px;border-radius:14px;background:white;border:none;outline:none;font-size:16px;color:#1a1c1e;font-family:'Inter',sans-serif;box-shadow:0 1px 4px rgba(0,30,64,.08);width:100%}
+.login-btn{width:100%;padding:18px;border-radius:14px;background:#001e40;color:white;border:none;font-family:'Manrope',sans-serif;font-size:17px;font-weight:700;cursor:pointer;letter-spacing:-.02em;transition:transform .15s}
+.login-btn:active{transform:scale(.98)}
+.login-err{color:#ba1a1a;font-size:13px;text-align:center;min-height:18px}
+.login-toggle{text-align:center;font-size:13px;color:#737780}
+.login-toggle a{color:#001e40;font-weight:600;cursor:pointer;text-decoration:none}
 </style>
 </head>
 <body>
+
+<!-- LOGIN -->
+<div id="screen-login" style="display:none">
+  <div class="login-wrap">
+    <div class="login-box">
+      <div class="login-logo">⚽ Kartoteka vaj</div>
+      <div class="login-sub" id="login-sub">Prijavi se v svoj račun</div>
+      <input class="login-input" type="email" id="login-email" placeholder="E-pošta" autocomplete="email">
+      <input class="login-input" type="password" id="login-pass" placeholder="Geslo" autocomplete="current-password">
+      <div class="login-err" id="login-err"></div>
+      <button class="login-btn" id="login-btn" onclick="doAuth()">Prijava</button>
+      <div class="login-toggle" id="login-toggle">Nimaš računa? <a onclick="toggleAuthMode()">Registracija</a></div>
+    </div>
+  </div>
+</div>
 
 <!-- LIBRARY -->
 <div class="screen active" id="screen-library">
@@ -133,7 +159,7 @@ canvas#drawCanvas{position:absolute;inset:0;width:100%;height:100%;touch-action:
   <main style="flex:1;overflow-y:auto">
     <div class="lib-head">
       <h2>Zbirka vaj</h2>
-      
+      <button onclick="doLogout()" style="background:none;border:none;font-size:12px;font-weight:600;color:#737780;cursor:pointer;font-family:'Inter',sans-serif;padding:4px 0">Odjava</button>
     </div>
     <div class="search-wrap">
       <svg width="16" height="16" fill="none" viewBox="0 0 16 16"><circle cx="7" cy="7" r="5" stroke="currentColor" stroke-width="1.5"/><path d="m11 11 3 3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
@@ -377,6 +403,7 @@ canvas#drawCanvas{position:absolute;inset:0;width:100%;height:100%;touch-action:
   </div>
 </div>
 
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <script>
 let drills=[],currentId=null,editingId=null,activeFilter='';
@@ -389,12 +416,62 @@ const MAX_UNDO=20;
 let vpScale=1,vpOffX=0,vpOffY=0;
 let pinchActive=false,pinchStartDist=0,pinchStartScale=1,pinchStartMidX=0,pinchStartMidY=0,pinchStartOffX=0,pinchStartOffY=0;
 let panActive=false,panStartX=0,panStartY=0,panStartOffX=0,panStartOffY=0;
-const KEY='miha_drills_v4';
-const CAT_ICON={'Ogrevanje':'🔥','Dinamična tehnika':'⚙️','Igralna oblika':'🎯',};
-const CAT_COLOR={'Ogrevanje':'#f97316','Dinamična tehnika':'#3b82f6','Igralna oblika':'#22c55e','Prosta igra':'#a855f7'};
+const SUPA_URL='https://nyslzoavoidumfmdlpfk.supabase.co';
+const SUPA_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im55c2x6b2F2b2lkdW1mbWRscGZrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzU0OTkxNDEsImV4cCI6MjA5MTA3NTE0MX0.4yKsVk-ytTjJ2pjoqqJetsng0piQ-wj1axUpWeGOnEM';
+const sb=supabase.createClient(SUPA_URL,SUPA_KEY);
 
-function loadDrills(){try{drills=JSON.parse(localStorage.getItem(KEY))||[];}catch(e){drills=[];}renderLibrary();}
-function saveDrills(){try{localStorage.setItem(KEY,JSON.stringify(drills));}catch(e){}}
+let authMode='login'; // 'login' | 'register'
+
+function toggleAuthMode(){
+  authMode=authMode==='login'?'register':'login';
+  document.getElementById('login-btn').textContent=authMode==='login'?'Prijava':'Registracija';
+  document.getElementById('login-sub').textContent=authMode==='login'?'Prijavi se v svoj račun':'Ustvari nov račun';
+  document.getElementById('login-toggle').innerHTML=authMode==='login'?'Nimaš računa? <a onclick="toggleAuthMode()">Registracija</a>':'Imaš račun? <a onclick="toggleAuthMode()">Prijava</a>';
+  document.getElementById('login-err').textContent='';
+}
+
+async function doAuth(){
+  const email=document.getElementById('login-email').value.trim();
+  const pass=document.getElementById('login-pass').value;
+  const errEl=document.getElementById('login-err');
+  const btn=document.getElementById('login-btn');
+  if(!email||!pass){errEl.textContent='Vnesi e-pošto in geslo.';return;}
+  btn.textContent='...';btn.disabled=true;
+  const {error}=authMode==='login'
+    ?await sb.auth.signInWithPassword({email,password:pass})
+    :await sb.auth.signUp({email,password:pass});
+  btn.disabled=false;
+  btn.textContent=authMode==='login'?'Prijava':'Registracija';
+  if(error){errEl.textContent=error.message;return;}
+  if(authMode==='register'){errEl.style.color='#1a7a1a';errEl.textContent='Račun ustvarjen! Preveri e-pošto za potrditev.';return;}
+}
+
+async function doLogout(){
+  await sb.auth.signOut();
+  drills=[];
+  showLoginScreen();
+}
+
+function showLoginScreen(){
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  document.getElementById('screen-login').style.display='flex';
+  document.getElementById('screen-login').style.flexDirection='column';
+}
+function hideLoginScreen(){
+  document.getElementById('screen-login').style.display='none';
+}
+
+async function loadDrills(){
+  const {data,error}=await sb.from('drills').select('*').order('created_at',{ascending:false});
+  if(error){console.error(error);drills=[];}
+  else drills=(data||[]).map(r=>({id:r.id,ime:r.ime,skupina:r.skupina,kategorija:r.kategorija,teme:r.teme,potek:r.potek,datum:r.datum,igralci:r.igralci,coaching:r.coaching,variacije:r.variacije,nasveti:r.nasveti,diagram:r.diagram}));
+  renderLibrary();
+}
+
+async function saveDrills(){/* no-op, replaced by per-drill saves */}
+
+const CAT_ICON={'Ogrevanje':'🔥','Dinamična tehnika':'⚙️','Igralna oblika':'🎯'};
+const CAT_COLOR={'Ogrevanje':'#f97316','Dinamična tehnika':'#3b82f6','Igralna oblika':'#22c55e','Prosta igra':'#a855f7'};
 
 function setFilter(cat,el){
   activeFilter=cat;
@@ -463,8 +540,9 @@ function editDrill(){
   setTimeout(()=>{initCanvas();if(d.diagram){const img=new Image();img.onload=()=>ctx.drawImage(img,0,0,canvas.width,canvas.height);img.src=d.diagram;}else clearCanvas();},60);
 }
 
-function saveDrill(andPDF){
-  // Zajemi diagram z belim ozadjem (canvas je sicer prozoren)
+async function saveDrill(andPDF){
+  const btn=document.getElementById('saveBtn');
+  if(btn){btn.textContent='...';btn.disabled=true;}
   let diagramData='';
   if(canvas){
     const off=document.createElement('canvas');
@@ -475,13 +553,32 @@ function saveDrill(andPDF){
     offCtx.drawImage(canvas,0,0);
     diagramData=off.toDataURL('image/png');
   }
-  const d={id:editingId||Date.now().toString(),ime:document.getElementById('f_ime').value.trim()||'Brez imena',skupina:document.getElementById('f_skupina').value,kategorija:document.getElementById('f_kategorija').value,teme:document.getElementById('f_teme').value,potek:document.getElementById('f_potek').value,datum:document.getElementById('f_datum').value,igralci:document.getElementById('f_igralci').value,coaching:document.getElementById('f_coaching').value,variacije:document.getElementById('f_variacije').value,nasveti:document.getElementById('f_nasveti').value,diagram:diagramData,};
-  if(editingId){const i=drills.findIndex(x=>x.id===editingId);if(i>=0)drills[i]=d;}else drills.unshift(d);
-  saveDrills();currentId=d.id;renderView(d);showScreen('view');
-  if(andPDF)setTimeout(()=>doExportPDF(d),300);
+  const {data:{user}}=await sb.auth.getUser();
+  const row={ime:document.getElementById('f_ime').value.trim()||'Brez imena',skupina:document.getElementById('f_skupina').value,kategorija:document.getElementById('f_kategorija').value,teme:document.getElementById('f_teme').value,potek:document.getElementById('f_potek').value,datum:document.getElementById('f_datum').value,igralci:document.getElementById('f_igralci').value,coaching:document.getElementById('f_coaching').value,variacije:document.getElementById('f_variacije').value,nasveti:document.getElementById('f_nasveti').value,diagram:diagramData,user_id:user.id};
+  let saved;
+  if(editingId){
+    const {data,error}=await sb.from('drills').update(row).eq('id',editingId).select().single();
+    if(error){alert('Napaka: '+error.message);if(btn){btn.textContent='Shrani';btn.disabled=false;}return;}
+    saved=data;
+    const i=drills.findIndex(x=>x.id===editingId);if(i>=0)drills[i]=saved;
+  } else {
+    const {data,error}=await sb.from('drills').insert(row).select().single();
+    if(error){alert('Napaka: '+error.message);if(btn){btn.textContent='Shrani';btn.disabled=false;}return;}
+    saved=data;
+    drills.unshift(saved);
+  }
+  if(btn){btn.textContent='Shrani';btn.disabled=false;}
+  currentId=saved.id;renderView(saved);showScreen('view');
+  if(andPDF)setTimeout(()=>doExportPDF(saved),300);
 }
 
-function deleteDrill(){if(!confirm('Izbriši vajo?'))return;drills=drills.filter(x=>x.id!==editingId);saveDrills();goLibrary();}
+async function deleteDrill(){
+  if(!confirm('Izbriši vajo?'))return;
+  const {error}=await sb.from('drills').delete().eq('id',editingId);
+  if(error){alert('Napaka: '+error.message);return;}
+  drills=drills.filter(x=>x.id!==editingId);
+  goLibrary();
+}
 function viewDrill(id){currentId=id;const d=drills.find(x=>x.id===id);if(!d)return;renderView(d);showScreen('view');}
 
 function renderView(d){
@@ -978,7 +1075,18 @@ function setTool(t){
 function setColor(c,el){currentColor=c;document.querySelectorAll('.fcolor').forEach(d=>d.classList.remove('active'));el.classList.add('active');if(currentTool==='eraser')setTool('pen');}
 function clearCanvas(){if(ctx&&!canvasIsBlank()){saveUndo();ctx.fillStyle='#ffffff';ctx.fillRect(0,0,canvas.width,canvas.height);}}
 
-loadDrills();
+// Auth init
+sb.auth.onAuthStateChange((event,session)=>{
+  if(session){
+    hideLoginScreen();
+    document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+    document.getElementById('screen-library').classList.add('active');
+    loadDrills();
+  } else {
+    drills=[];
+    showLoginScreen();
+  }
+});
 </script>
 </body>
 </html>
