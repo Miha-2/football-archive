@@ -155,7 +155,10 @@ canvas#drawCanvas{position:absolute;inset:0;width:100%;height:100%;touch-action:
 <!-- EDITOR -->
 <div class="screen" id="screen-form">
   <header>
-    <button class="back-btn" onclick="goLibrary()">&#8592;</button>
+    <button class="back-btn" onclick="goLibrary()" style="display:flex;align-items:center;gap:5px;width:auto;padding:0 10px 0 4px;border-radius:20px;font-size:13px;font-weight:600;font-family:'Inter',sans-serif;color:#001e40;background:#e8e8ea;border:none;height:34px;cursor:pointer">
+      <svg width="16" height="16" fill="none" viewBox="0 0 16 16"><path d="M10 12L6 8l4-4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      Nazaj
+    </button>
     <div style="flex:1;text-align:center">
       <div class="header-title" id="formTitle" style="font-size:17px">Nova vaja</div>
     </div>
@@ -171,9 +174,10 @@ canvas#drawCanvas{position:absolute;inset:0;width:100%;height:100%;touch-action:
       <div class="canvas-wrap">
         <canvas id="drawCanvas"></canvas>
       </div>
-      <!-- toolbar below canvas, scrollable -->
-      <div style="overflow-x:auto;-webkit-overflow-scrolling:touch;padding-bottom:2px">
-        <div class="canvas-float-bar" style="margin-top:10px;width:max-content">
+      <!-- toolbar: 2 rows -->
+      <div class="canvas-float-bar" style="margin-top:10px;flex-direction:column;align-items:stretch;gap:0;padding:8px 10px">
+        <!-- Row 1: drawing tools + undo/redo -->
+        <div style="display:flex;align-items:center;gap:2px">
           <button class="ftool active" id="tool-pen" onclick="setTool('pen')" title="Prostoročna črta">
             <svg width="15" height="15" viewBox="0 0 15 15" fill="none"><path d="M2 12 Q4 6 8 5 Q11 4 13 3" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" fill="none"/></svg>
           </button>
@@ -195,21 +199,27 @@ canvas#drawCanvas{position:absolute;inset:0;width:100%;height:100%;touch-action:
           <button class="ftool" id="tool-eraser" onclick="setTool('eraser')" title="Brisalo">
             <svg width="15" height="15" viewBox="0 0 15 15" fill="none"><path d="M3 12h9M5.5 4l5.5 5.5M3 10l3.5-6 5.5 5.5-2.5 2.5H4l-1-1z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
           </button>
+          <div style="flex:1"></div>
           <button class="ftool" id="undo-btn" onclick="undo()" title="Razveljavi" style="opacity:0.35">
             <svg width="15" height="15" viewBox="0 0 15 15" fill="none"><path d="M3 7a5 5 0 1 0 1.5-3.5L2 2" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/><path d="M2 2v3.5H5.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
           </button>
           <button class="ftool" id="redo-btn" onclick="redo()" title="Ponovi" style="opacity:0.35">
             <svg width="15" height="15" viewBox="0 0 15 15" fill="none"><path d="M12 7a5 5 0 1 1-1.5-3.5L13 2" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/><path d="M13 2v3.5H9.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
           </button>
-          <div class="fbar-sep"></div>
+        </div>
+        <!-- divider -->
+        <div style="height:1px;background:#e8e8ea;margin:6px 0"></div>
+        <!-- Row 2: colors + zoom + clear -->
+        <div style="display:flex;align-items:center;gap:2px">
           <div class="fcolor" style="background:#001e40" onclick="setColor('#001e40',this)"></div>
           <div class="fcolor active" style="background:#94f990" onclick="setColor('#94f990',this)"></div>
           <div class="fcolor" style="background:#ff6b6b" onclick="setColor('#ff6b6b',this)"></div>
           <div class="fcolor" style="background:#ffd93d" onclick="setColor('#ffd93d',this)"></div>
           <div class="fcolor" style="background:#a7c8ff" onclick="setColor('#a7c8ff',this)"></div>
+          <div style="flex:1"></div>
+          <button class="ftool" id="zoom-reset-btn" onclick="resetZoom()" title="Ponastavi zoom" style="font-size:12px;font-weight:700;opacity:0.35;min-width:36px">1:1</button>
           <div class="fbar-sep"></div>
-          <button class="ftool" id="zoom-reset-btn" onclick="resetZoom()" title="Ponastavi zoom" style="font-size:13px;font-weight:700;opacity:0.35">1:1</button>
-          <button class="ftool" onclick="clearCanvas()" title="Pobriši">
+          <button class="ftool" onclick="clearCanvas()" title="Pobriši vse">
             <svg width="16" height="16" viewBox="0 0 16 16"><path d="M2 4h12M5 4V3a1 1 0 011-1h4a1 1 0 011 1v1M6 8v4M10 8v4M3 4l1 9a1 1 0 001 1h6a1 1 0 001-1l1-9" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" fill="none"/></svg>
           </button>
         </div>
