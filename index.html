@@ -199,6 +199,16 @@ canvas#drawCanvas{position:absolute;inset:0;width:100%;height:100%;touch-action:
           <button class="ftool" id="tool-eraser" onclick="setTool('eraser')" title="Brisalo">
             <svg width="15" height="15" viewBox="0 0 15 15" fill="none"><path d="M3 12h9M5.5 4l5.5 5.5M3 10l3.5-6 5.5 5.5-2.5 2.5H4l-1-1z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
           </button>
+          <div class="fbar-sep"></div>
+          <button class="ftool" id="tool-line" onclick="setTool('line')" title="Ravna črta">
+            <svg width="15" height="15" viewBox="0 0 15 15" fill="none"><line x1="2" y1="13" x2="13" y2="2" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+          </button>
+          <button class="ftool" id="tool-circle" onclick="setTool('circle')" title="Krog">
+            <svg width="15" height="15" viewBox="0 0 15 15" fill="none"><circle cx="7.5" cy="7.5" r="5" stroke="currentColor" stroke-width="1.8"/></svg>
+          </button>
+          <button class="ftool" id="tool-cross" onclick="setTool('cross')" title="Križec">
+            <svg width="15" height="15" viewBox="0 0 15 15" fill="none"><line x1="3" y1="3" x2="12" y2="12" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><line x1="12" y1="3" x2="3" y2="12" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+          </button>
           <div style="flex:1"></div>
           <button class="ftool" id="undo-btn" onclick="undo()" title="Razveljavi" style="opacity:0.35">
             <svg width="15" height="15" viewBox="0 0 15 15" fill="none"><path d="M3 7a5 5 0 1 0 1.5-3.5L2 2" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/><path d="M2 2v3.5H5.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
@@ -822,6 +832,26 @@ function redrawFreePoints(tool){
 }
 
 function isFreehand(t){return t==='pen'||t==='pen-arrow'||t==='dash'||t==='dash-arrow'||t==='wavy'||t==='wavy-arrow';}
+function isShape(t){return t==='line'||t==='circle'||t==='cross';}
+
+function drawShape(tool, x1, y1, x2, y2){
+  const dx=x2-x1, dy=y2-y1;
+  const size=Math.max(Math.abs(dx),Math.abs(dy));
+  const sx=dx<0?-1:1, sy=dy<0?-1:1;
+  applyStrokeStyle(tool);
+  ctx.beginPath();
+  if(tool==='line'){
+    ctx.moveTo(x1,y1);ctx.lineTo(x2,y2);ctx.stroke();
+  } else if(tool==='circle'){
+    const cx=x1+sx*size/2, cy=y1+sy*size/2;
+    ctx.arc(cx,cy,size/2,0,Math.PI*2);ctx.stroke();
+  } else if(tool==='cross'){
+    const ex=x1+sx*size, ey=y1+sy*size;
+    ctx.moveTo(x1,y1);ctx.lineTo(ex,ey);
+    ctx.moveTo(ex,y1);ctx.lineTo(x1,ey);
+    ctx.stroke();
+  }
+}
 
 function startDraw(e){
   e.preventDefault();
@@ -854,6 +884,10 @@ function drawing(e){
     applyStrokeStyle(currentTool);
     redrawFreePoints(currentTool);
   }
+  if(isShape(currentTool)){
+    ctx.putImageData(snapshot,0,0);
+    drawShape(currentTool,startX,startY,p.x,p.y);
+  }
 }
 
 function showEraserCursor(x,y){
@@ -876,8 +910,26 @@ function hideEraserCursor(){
   const el=document.getElementById('eraser-cursor');
   if(el)el.style.display='none';
 }
+function canvasIsBlank(){
+  const d=ctx.getImageData(0,0,canvas.width,canvas.height).data;
+  for(let i=0;i<d.length;i+=4)if(d[i]!==255||d[i+1]!==255||d[i+2]!==255)return false;
+  return true;
+}
+function statesEqual(a,b){
+  if(!a||!b)return false;
+  const ad=a.data,bd=b.data;
+  if(ad.length!==bd.length)return false;
+  // sample ~400 evenly spaced pixels for speed, then full check only if sample matches
+  const step=Math.max(4,Math.floor(ad.length/1600)*4);
+  for(let i=0;i<ad.length;i+=step)if(ad[i]!==bd[i]||ad[i+1]!==bd[i+1]||ad[i+2]!==bd[i+2])return false;
+  for(let i=0;i<ad.length;i++)if(ad[i]!==bd[i])return false;
+  return true;
+}
 function saveUndo(){
-  undoStack.push(ctx.getImageData(0,0,canvas.width,canvas.height));
+  const current=ctx.getImageData(0,0,canvas.width,canvas.height);
+  const last=undoStack[undoStack.length-1];
+  if(statesEqual(current,last))return;
+  undoStack.push(current);
   if(undoStack.length>MAX_UNDO)undoStack.shift();
   redoStack=[];
   document.getElementById('undo-btn').style.opacity='1';
@@ -909,6 +961,11 @@ function endDraw(e){
     redrawFreePoints(currentTool);
     freePoints=[];
   }
+  if(isShape(currentTool)){
+    const p=getPos(e);
+    ctx.putImageData(snapshot,0,0);
+    drawShape(currentTool,startX,startY,p.x,p.y);
+  }
 }
 
 function setTool(t){
@@ -919,7 +976,7 @@ function setTool(t){
   if(el)el.classList.add('active');
 }
 function setColor(c,el){currentColor=c;document.querySelectorAll('.fcolor').forEach(d=>d.classList.remove('active'));el.classList.add('active');if(currentTool==='eraser')setTool('pen');}
-function clearCanvas(){if(ctx){saveUndo();ctx.fillStyle='#ffffff';ctx.fillRect(0,0,canvas.width,canvas.height);}}
+function clearCanvas(){if(ctx&&!canvasIsBlank()){saveUndo();ctx.fillStyle='#ffffff';ctx.fillRect(0,0,canvas.width,canvas.height);}}
 
 loadDrills();
 </script>
