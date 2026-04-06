@@ -176,7 +176,7 @@ canvas#drawCanvas{position:absolute;inset:0;width:100%;height:100%;touch-action:
       </div>
       <!-- toolbar: 2 rows -->
       <div class="canvas-float-bar" style="margin-top:10px;flex-direction:column;align-items:stretch;gap:0;padding:8px 12px">
-        <!-- Row 1: drawing tools + undo/redo -->
+        <!-- Row 1: drawing tools -->
         <div style="display:flex;align-items:center;gap:1px">
           <button class="ftool active" id="tool-pen" onclick="setTool('pen')" title="Prostoročna črta">
             <svg width="15" height="15" viewBox="0 0 15 15" fill="none"><path d="M2 12 Q4 6 8 5 Q11 4 13 3" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" fill="none"/></svg>
@@ -196,9 +196,6 @@ canvas#drawCanvas{position:absolute;inset:0;width:100%;height:100%;touch-action:
           <button class="ftool" id="tool-wavy-arrow" onclick="setTool('wavy-arrow')" title="Vijugasta puščica">
             <svg width="15" height="15" viewBox="0 0 15 15" fill="none"><path d="M1 10 Q3 7 5 10 Q7 13 9 10 Q11 7 13 10" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" fill="none"/><path d="M13 10 L11 8 M13 10 L11 12" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
           </button>
-          <button class="ftool" id="tool-eraser" onclick="setTool('eraser')" title="Brisalo">
-            <svg width="15" height="15" viewBox="0 0 15 15" fill="none"><path d="M3 12h9M5.5 4l5.5 5.5M3 10l3.5-6 5.5 5.5-2.5 2.5H4l-1-1z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
-          </button>
           <div class="fbar-sep"></div>
           <button class="ftool" id="tool-line" onclick="setTool('line')" title="Ravna črta">
             <svg width="15" height="15" viewBox="0 0 15 15" fill="none"><line x1="2" y1="13" x2="13" y2="2" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
@@ -209,17 +206,10 @@ canvas#drawCanvas{position:absolute;inset:0;width:100%;height:100%;touch-action:
           <button class="ftool" id="tool-cross" onclick="setTool('cross')" title="Križec">
             <svg width="15" height="15" viewBox="0 0 15 15" fill="none"><line x1="3" y1="3" x2="12" y2="12" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><line x1="12" y1="3" x2="3" y2="12" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
           </button>
-          <div style="flex:1"></div>
-          <button class="ftool" id="undo-btn" onclick="undo()" title="Razveljavi" style="opacity:0.35">
-            <svg width="15" height="15" viewBox="0 0 15 15" fill="none"><path d="M3 7a5 5 0 1 0 1.5-3.5L2 2" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/><path d="M2 2v3.5H5.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
-          </button>
-          <button class="ftool" id="redo-btn" onclick="redo()" title="Ponovi" style="opacity:0.35">
-            <svg width="15" height="15" viewBox="0 0 15 15" fill="none"><path d="M12 7a5 5 0 1 1-1.5-3.5L13 2" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/><path d="M13 2v3.5H9.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
-          </button>
         </div>
         <!-- divider -->
         <div style="height:1px;background:#e8e8ea;margin:6px 0"></div>
-        <!-- Row 2: colors + zoom + clear -->
+        <!-- Row 2: colors + eraser + undo/redo + zoom + clear -->
         <div style="display:flex;align-items:center;gap:2px">
           <div class="fcolor" style="background:#001e40" onclick="setColor('#001e40',this)"></div>
           <div class="fcolor active" style="background:#94f990" onclick="setColor('#94f990',this)"></div>
@@ -227,8 +217,18 @@ canvas#drawCanvas{position:absolute;inset:0;width:100%;height:100%;touch-action:
           <div class="fcolor" style="background:#ffd93d" onclick="setColor('#ffd93d',this)"></div>
           <div class="fcolor" style="background:#a7c8ff" onclick="setColor('#a7c8ff',this)"></div>
           <div style="flex:1"></div>
-          <button class="ftool" id="zoom-reset-btn" onclick="resetZoom()" title="Ponastavi zoom" style="font-size:12px;font-weight:700;opacity:0.35;min-width:36px">1:1</button>
+          <button class="ftool" id="tool-eraser" onclick="setTool('eraser')" title="Brisalo">
+            <svg width="15" height="15" viewBox="0 0 15 15" fill="none"><path d="M3 12h9M5.5 4l5.5 5.5M3 10l3.5-6 5.5 5.5-2.5 2.5H4l-1-1z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </button>
           <div class="fbar-sep"></div>
+          <button class="ftool" id="undo-btn" onclick="undo()" title="Razveljavi" style="opacity:0.35">
+            <svg width="15" height="15" viewBox="0 0 15 15" fill="none"><path d="M3 7a5 5 0 1 0 1.5-3.5L2 2" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/><path d="M2 2v3.5H5.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </button>
+          <button class="ftool" id="redo-btn" onclick="redo()" title="Ponovi" style="opacity:0.35">
+            <svg width="15" height="15" viewBox="0 0 15 15" fill="none"><path d="M12 7a5 5 0 1 1-1.5-3.5L13 2" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/><path d="M13 2v3.5H9.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </button>
+          <div class="fbar-sep"></div>
+          <button class="ftool" id="zoom-reset-btn" onclick="resetZoom()" title="Ponastavi zoom" style="font-size:12px;font-weight:700;opacity:0.35;min-width:36px">1:1</button>
           <button class="ftool" onclick="clearCanvas()" title="Pobriši vse">
             <svg width="16" height="16" viewBox="0 0 16 16"><path d="M2 4h12M5 4V3a1 1 0 011-1h4a1 1 0 011 1v1M6 8v4M10 8v4M3 4l1 9a1 1 0 001 1h6a1 1 0 001-1l1-9" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" fill="none"/></svg>
           </button>
