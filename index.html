@@ -82,7 +82,7 @@ main{padding-bottom:24px;max-width:480px;margin:0 auto;width:100%}
 .editor-section-label{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:#43474f;font-family:'Inter',sans-serif;margin-bottom:6px}
 
 /* canvas */
-.canvas-wrap{position:relative;width:100%;aspect-ratio:4/3;background:#f0f0f0;border-radius:16px;overflow:hidden;box-shadow:inset 0 2px 8px rgba(0,0,0,.2)}
+.canvas-wrap{position:relative;width:100%;aspect-ratio:4/3;background:#ffffff;border-radius:16px;overflow:hidden;box-shadow:inset 0 2px 8px rgba(0,0,0,.2)}
 canvas#drawCanvas{position:absolute;inset:0;width:100%;height:100%;touch-action:none;cursor:crosshair}
 .canvas-float-bar{display:flex;align-items:center;gap:6px;background:white;border-radius:16px;padding:10px 14px;box-shadow:0 2px 12px rgba(0,30,64,.1);white-space:nowrap;flex-wrap:wrap;margin-top:10px}
 .ftool{background:none;border:none;width:36px;height:36px;border-radius:10px;display:flex;align-items:center;justify-content:center;cursor:pointer;color:#43474f;font-size:18px;transition:all .12s;flex-shrink:0}
@@ -162,7 +162,7 @@ canvas#drawCanvas{position:absolute;inset:0;width:100%;height:100%;touch-action:
     <div style="flex:1;text-align:center">
       <div class="header-title" id="formTitle" style="font-size:17px">Nova vaja</div>
     </div>
-    <button id="deleteBtn" onclick="deleteDrill()" style="display:none;background:none;border:none;color:#ba1a1a;font-size:14px;font-weight:600;cursor:pointer;font-family:'Inter',sans-serif">Izbriši</button>
+    <button id="saveBtn" onclick="saveDrill(false)" style="background:#001e40;border:none;border-radius:20px;padding:0 16px;height:34px;color:white;font-size:13px;font-weight:600;cursor:pointer;font-family:'Inter',sans-serif">Shrani</button>
   </header>
   <div class="editor-main">
 
@@ -292,8 +292,8 @@ canvas#drawCanvas{position:absolute;inset:0;width:100%;height:100%;touch-action:
       </div>
     </div>
 
-    <button class="deploy-btn" onclick="saveDrill(false)">Shrani v zbirko</button>
     <button onclick="saveDrill(true)" style="width:100%;padding:18px;border-radius:14px;background:#94f990;color:#002204;border:none;font-family:'Manrope',sans-serif;font-size:15px;font-weight:700;cursor:pointer;letter-spacing:-.01em">Shrani &amp; izvozi PDF</button>
+    <button id="deleteBtn" onclick="deleteDrill()" style="display:none;width:100%;padding:18px;border-radius:14px;background:#fff0f0;color:#ba1a1a;border:none;font-family:'Manrope',sans-serif;font-size:15px;font-weight:700;cursor:pointer;letter-spacing:-.01em">Izbriši vajo</button>
     <div style="height:8px"></div>
   </div>
 </div>
@@ -301,7 +301,10 @@ canvas#drawCanvas{position:absolute;inset:0;width:100%;height:100%;touch-action:
 <!-- DETAIL / VIEW -->
 <div class="screen" id="screen-view">
   <header>
-    <button class="back-btn" onclick="goLibrary()">&#8592;</button>
+    <button class="back-btn" onclick="goLibrary()" style="display:flex;align-items:center;gap:5px;width:auto;padding:0 10px 0 4px;border-radius:20px;font-size:13px;font-weight:600;font-family:'Inter',sans-serif;color:#001e40;background:#e8e8ea;border:none;height:34px;cursor:pointer">
+      <svg width="16" height="16" fill="none" viewBox="0 0 16 16"><path d="M10 12L6 8l4-4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      Nazaj
+    </button>
     <div style="flex:1"></div>
     <div style="display:flex;gap:8px;align-items:center">
       <button onclick="editDrill()" style="background:#f3f3f6;border:none;border-radius:8px;padding:8px 16px;font-size:13px;font-weight:600;cursor:pointer;color:#001e40;font-family:'Inter',sans-serif">Uredi</button>
@@ -451,7 +454,18 @@ function editDrill(){
 }
 
 function saveDrill(andPDF){
-  const d={id:editingId||Date.now().toString(),ime:document.getElementById('f_ime').value.trim()||'Brez imena',skupina:document.getElementById('f_skupina').value,kategorija:document.getElementById('f_kategorija').value,teme:document.getElementById('f_teme').value,potek:document.getElementById('f_potek').value,datum:document.getElementById('f_datum').value,igralci:document.getElementById('f_igralci').value,coaching:document.getElementById('f_coaching').value,variacije:document.getElementById('f_variacije').value,nasveti:document.getElementById('f_nasveti').value,diagram:canvas?canvas.toDataURL('image/png'):'',};
+  // Zajemi diagram z belim ozadjem (canvas je sicer prozoren)
+  let diagramData='';
+  if(canvas){
+    const off=document.createElement('canvas');
+    off.width=canvas.width;off.height=canvas.height;
+    const offCtx=off.getContext('2d');
+    offCtx.fillStyle='#ffffff';
+    offCtx.fillRect(0,0,off.width,off.height);
+    offCtx.drawImage(canvas,0,0);
+    diagramData=off.toDataURL('image/png');
+  }
+  const d={id:editingId||Date.now().toString(),ime:document.getElementById('f_ime').value.trim()||'Brez imena',skupina:document.getElementById('f_skupina').value,kategorija:document.getElementById('f_kategorija').value,teme:document.getElementById('f_teme').value,potek:document.getElementById('f_potek').value,datum:document.getElementById('f_datum').value,igralci:document.getElementById('f_igralci').value,coaching:document.getElementById('f_coaching').value,variacije:document.getElementById('f_variacije').value,nasveti:document.getElementById('f_nasveti').value,diagram:diagramData,};
   if(editingId){const i=drills.findIndex(x=>x.id===editingId);if(i>=0)drills[i]=d;}else drills.unshift(d);
   saveDrills();currentId=d.id;renderView(d);showScreen('view');
   if(andPDF)setTimeout(()=>doExportPDF(d),300);
@@ -670,6 +684,7 @@ function initCanvas(){
   canvas.width=wrap.clientWidth;
   canvas.height=wrap.clientHeight||Math.round(wrap.clientWidth*3/4);
   ctx=canvas.getContext('2d');ctx.lineCap='round';ctx.lineJoin='round';ctx.lineWidth=2.5;ctx.strokeStyle=currentColor;
+  ctx.fillStyle='#ffffff';ctx.fillRect(0,0,canvas.width,canvas.height);
   vpScale=1;vpOffX=0;vpOffY=0;
   applyViewport();
   // remove old listeners
@@ -825,7 +840,7 @@ function drawing(e){
   e.preventDefault();
   const p=getPos(e);
   if(currentTool==='eraser'){
-    ctx.strokeStyle='#f0f0f0';ctx.lineWidth=32;ctx.setLineDash([]);
+    ctx.strokeStyle='#ffffff';ctx.lineWidth=32;ctx.setLineDash([]);
     ctx.lineCap='round';ctx.lineJoin='round';
     ctx.lineTo(p.x,p.y);ctx.stroke();
     ctx.beginPath();ctx.moveTo(p.x,p.y);
@@ -904,7 +919,7 @@ function setTool(t){
   if(el)el.classList.add('active');
 }
 function setColor(c,el){currentColor=c;document.querySelectorAll('.fcolor').forEach(d=>d.classList.remove('active'));el.classList.add('active');if(currentTool==='eraser')setTool('pen');}
-function clearCanvas(){if(ctx){saveUndo();ctx.clearRect(0,0,canvas.width,canvas.height);}}
+function clearCanvas(){if(ctx){saveUndo();ctx.fillStyle='#ffffff';ctx.fillRect(0,0,canvas.width,canvas.height);}}
 
 loadDrills();
 </script>
