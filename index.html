@@ -1063,7 +1063,25 @@ function setTool(t){
 function setColor(c,el){currentColor=c;document.querySelectorAll('.fcolor').forEach(d=>d.classList.remove('active'));el.classList.add('active');if(currentTool==='eraser')setTool('pen');}
 function clearCanvas(){if(ctx&&!canvasIsBlank()){saveUndo();ctx.fillStyle='#ffffff';ctx.fillRect(0,0,canvas.width,canvas.height);}}
 
-// Auth init
+// Service Worker
+if('serviceWorker' in navigator){
+  navigator.serviceWorker.register('/sw.js').then(reg => {
+    reg.addEventListener('updatefound', () => {
+      const newSW = reg.installing;
+      newSW.addEventListener('statechange', () => {
+        if(newSW.state === 'installed' && navigator.serviceWorker.controller){
+          // Nova verzija je na voljo — tiho posodobi
+          newSW.postMessage({type:'SKIP_WAITING'});
+        }
+      });
+    });
+  });
+  navigator.serviceWorker.addEventListener('controllerchange', () => {
+    window.location.reload();
+  });
+}
+
+loadDrills();
 sb.auth.onAuthStateChange((event,session)=>{
   if(session){
     hideLoginScreen();
