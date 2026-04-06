@@ -612,7 +612,7 @@ function drawArrowHead(pts){
   if(pts.length<2)return;
   const last=pts[pts.length-1];
   // direction from a few points back for smooth angle
-  const ref=pts[Math.max(0,pts.length-8)];
+  const ref=pts[Math.max(0,pts.length-20)];
   const a=Math.atan2(last.y-ref.y,last.x-ref.x);
   const h=13;
   ctx.setLineDash([]);
@@ -719,6 +719,7 @@ function startDraw(e){
   const p=getPos(e);
   startX=p.x;startY=p.y;
   freePoints=[p];
+  saveUndo();
   snapshot=ctx.getImageData(0,0,canvas.width,canvas.height);
   if(currentTool==='eraser'){ctx.beginPath();ctx.moveTo(p.x,p.y);}
 }
