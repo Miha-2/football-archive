@@ -682,7 +682,7 @@ function initCanvas(){
   canvas.addEventListener('pointerup',onPointerUp);
   canvas.addEventListener('pointerleave',onPointerUp);
   canvas.style.touchAction='none';
-  undoStack=[ctx.getImageData(0,0,canvas.width,canvas.height)];redoStack=[];
+  undoStack=[];redoStack=[];
   const ubtn=document.getElementById('undo-btn');if(ubtn)ubtn.style.opacity='0.35';
   const rbtn=document.getElementById('redo-btn');if(rbtn)rbtn.style.opacity='0.35';
 }
@@ -815,6 +815,7 @@ function startDraw(e){
   const p=getPos(e);
   startX=p.x;startY=p.y;
   freePoints=[p];
+  saveUndo(); // shrani stanje PRED potezo
   snapshot=ctx.getImageData(0,0,canvas.width,canvas.height);
   if(currentTool==='eraser'){ctx.beginPath();ctx.moveTo(p.x,p.y);}
 }
@@ -864,7 +865,7 @@ function saveUndo(){
   undoStack.push(ctx.getImageData(0,0,canvas.width,canvas.height));
   if(undoStack.length>MAX_UNDO)undoStack.shift();
   redoStack=[];
-  document.getElementById('undo-btn').style.opacity=undoStack.length?'1':'0.35';
+  document.getElementById('undo-btn').style.opacity='1';
   document.getElementById('redo-btn').style.opacity='0.35';
 }
 function undo(){
@@ -884,7 +885,7 @@ function redo(){
 function endDraw(e){
   if(!isDrawing)return;
   isDrawing=false;
-  if(currentTool==='eraser'){hideEraserCursor();saveUndo();return;}
+  if(currentTool==='eraser'){hideEraserCursor();return;}
   if(isFreehand(currentTool)){
     const p=getPos(e);
     if(p.x!==startX||p.y!==startY)freePoints.push(p);
@@ -892,7 +893,6 @@ function endDraw(e){
     applyStrokeStyle(currentTool);
     redrawFreePoints(currentTool);
     freePoints=[];
-    saveUndo();
   }
 }
 
