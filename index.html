@@ -122,8 +122,8 @@ canvas#drawCanvas{position:absolute;inset:0;width:100%;height:100%;touch-action:
 .detail-tag{background:#f0f2f7;color:#3d5a78;padding:5px 12px;border-radius:999px;font-size:12px;font-weight:600;font-family:'Inter',sans-serif}
 .detail-row2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
 .detail-diagram-wrap{background:white;border-radius:16px;overflow:hidden}
-.detail-diagram-img{width:100%;aspect-ratio:16/10;object-fit:cover;display:block}
-.detail-diagram-empty{aspect-ratio:16/10;background:linear-gradient(135deg,#001e40,#002d5c);display:flex;align-items:center;justify-content:center;position:relative}
+.detail-diagram-img{width:100%;aspect-ratio:4/3;object-fit:cover;display:block}
+.detail-diagram-empty{aspect-ratio:4/3;background:linear-gradient(135deg,#001e40,#002d5c);display:flex;align-items:center;justify-content:center;position:relative}
 .detail-diagram-empty .pg{position:absolute;inset:0;background-image:linear-gradient(rgba(255,255,255,.04) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.04) 1px,transparent 1px);background-size:32px 32px}
 .detail-diagram-empty span{color:rgba(255,255,255,.3);font-size:12px;font-weight:600;letter-spacing:.12em;text-transform:uppercase;font-family:'Inter',sans-serif;position:relative}
 .detail-export-btn{margin:4px 16px 24px;width:calc(100% - 32px);padding:16px;border-radius:14px;background:#94f990;color:#002204;border:none;font-family:'Manrope',sans-serif;font-size:15px;font-weight:700;cursor:pointer;letter-spacing:-.01em}
@@ -360,7 +360,6 @@ canvas#drawCanvas{position:absolute;inset:0;width:100%;height:100%;touch-action:
       <div class="detail-hero-inner">
       <div class="detail-hero-pills">
         <span class="detail-hero-pill green" id="v_kat_pill"></span>
-        <span class="detail-hero-pill" id="v_skupina_pill"></span>
         <span id="v_teme_pills"></span>
       </div>
       <div class="detail-hero-name" id="v_ime"></div>
@@ -393,15 +392,11 @@ canvas#drawCanvas{position:absolute;inset:0;width:100%;height:100%;touch-action:
           <div class="detail-block-content" id="v_nasveti"></div>
         </div>
       </div>
-      <div class="detail-row2">
-        <div class="detail-block">
-          <div class="detail-block-label">Datum nastanka</div>
-          <div class="detail-block-content" id="v_datum"></div>
-        </div>
-        <div class="detail-block">
-          <div class="detail-block-label">Število igralcev</div>
-          <div class="detail-block-content" id="v_igralci"></div>
-        </div>
+      <!-- meta info: subtle, secondary -->
+      <div id="v_meta" style="display:flex;gap:16px;padding:4px 2px 8px;flex-wrap:wrap">
+        <span id="v_skupina_meta" style="font-size:12px;color:#737780;font-family:'Inter',sans-serif"></span>
+        <span id="v_datum_meta" style="font-size:12px;color:#737780;font-family:'Inter',sans-serif"></span>
+        <span id="v_igralci_meta" style="font-size:12px;color:#737780;font-family:'Inter',sans-serif"></span>
       </div>
     </div>
     <div style="max-width:480px;margin:0 auto"><button class="detail-export-btn" onclick="exportPDF()">Izvozi PDF</button></div>
@@ -587,10 +582,8 @@ async function deleteDrill(){
 function viewDrill(id){currentId=id;const d=drills.find(x=>x.id===id);if(!d)return;renderView(d);showScreen('view');}
 
 function renderView(d){
-  const sp=document.getElementById('v_skupina_pill');
   const kp=document.getElementById('v_kat_pill');
   kp.textContent=d.kategorija||''; kp.style.display=d.kategorija?'':'none';
-  sp.textContent=d.skupina||''; sp.style.display=d.skupina?'':'none';
   const tp=document.getElementById('v_teme_pills');
   if(tp) tp.innerHTML=d.teme?d.teme.split(',').map(t=>`<span class="detail-hero-pill" style="display:inline-block">${t.trim()}</span>`).join(''):'';
   document.getElementById('v_ime').textContent=d.ime||'';
@@ -598,8 +591,15 @@ function renderView(d){
   document.getElementById('v_coaching').textContent=d.coaching||'—';
   document.getElementById('v_variacije').textContent=d.variacije||'—';
   document.getElementById('v_nasveti').textContent=d.nasveti||'—';
-  document.getElementById('v_datum').textContent=d.datum||'—';
-  document.getElementById('v_igralci').textContent=d.igralci||'—';
+  // meta row — skupina, datum, igralci
+  const sm=document.getElementById('v_skupina_meta');
+  const dm=document.getElementById('v_datum_meta');
+  const im=document.getElementById('v_igralci_meta');
+  if(sm){sm.textContent=d.skupina?'👥 '+d.skupina:'';sm.style.display=d.skupina?'':'none';}
+  if(dm){dm.textContent=d.datum?'📅 '+d.datum:'';dm.style.display=d.datum?'':'none';}
+  if(im){im.textContent=d.igralci?'🔢 '+d.igralci:'';im.style.display=d.igralci?'':'none';}
+  const meta=document.getElementById('v_meta');
+  if(meta)meta.style.display=(d.skupina||d.datum||d.igralci)?'flex':'none';
 
   const img=document.getElementById('v_diagram');
   const ph=document.getElementById('v_diag_placeholder');
