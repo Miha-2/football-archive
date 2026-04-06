@@ -1,0 +1,783 @@
+<!DOCTYPE html>
+<html lang="sl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Kartoteka vaj</title>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+html,body{height:100%;min-height:100dvh}
+body{font-family:'Inter',sans-serif;background:#f9f9fc;color:#1a1c1e;overscroll-behavior:none}
+.no-scrollbar::-webkit-scrollbar{display:none}
+.no-scrollbar{-ms-overflow-style:none;scrollbar-width:none}
+.pitch-grid{background-image:linear-gradient(rgba(255,255,255,0.05) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,0.05) 1px,transparent 1px);background-size:40px 40px}
+
+/* screens */
+.screen{display:none;flex-direction:column;min-height:100dvh}
+.screen.active{display:flex}
+
+/* header */
+header{background:#f3f3f6;display:flex;align-items:center;justify-content:space-between;padding:0 24px;height:64px;position:sticky;top:0;z-index:50;box-shadow:0 -4px 24px rgba(26,28,30,0.06)}
+.header-title{font-family:'Manrope',sans-serif;font-size:20px;font-weight:800;color:#001e40;letter-spacing:-0.03em}
+.avatar{width:32px;height:32px;border-radius:50%;background:#003366;display:flex;align-items:center;justify-content:center;font-size:10px;color:white;font-weight:700}
+.back-btn{display:flex;align-items:center;justify-content:center;width:36px;height:36px;border-radius:50%;background:#f3f3f6;border:none;color:#001e40;font-size:18px;cursor:pointer}
+
+/* main content */
+main{padding-bottom:24px;max-width:480px;margin:0 auto;width:100%}
+
+/* library */
+.lib-head{padding:24px 16px 8px;display:flex;align-items:center;justify-content:space-between}
+.lib-head h2{font-family:'Manrope',sans-serif;font-size:24px;font-weight:800;color:#001e40;letter-spacing:-0.03em}
+.active-badge{background:#94f990;color:#002204;padding:4px 12px;border-radius:999px;font-size:11px;font-weight:700;font-family:'Inter',sans-serif;text-transform:uppercase;letter-spacing:.06em}
+
+/* search */
+.search-wrap{padding:0 16px 12px;position:relative}
+.search-wrap svg{position:absolute;left:28px;top:50%;transform:translateY(-50%);color:#737780}
+.search-wrap input{width:100%;padding:14px 16px 14px 44px;border-radius:12px;background:#f3f3f6;border:none;outline:none;font-size:14px;color:#1a1c1e;font-family:'Inter',sans-serif}
+.search-wrap input::placeholder{color:#737780}
+
+/* filter chips */
+.chips{display:flex;gap:8px;padding:0 16px 16px;overflow-x:auto}
+.chips::-webkit-scrollbar{display:none}
+.chip{background:#e8e8ea;color:#43474f;padding:8px 16px;border-radius:999px;font-size:12px;font-weight:700;white-space:nowrap;cursor:pointer;border:none;font-family:'Inter',sans-serif;flex-shrink:0;transition:all .15s}
+.chip.active{background:#001e40;color:white}
+
+/* drill cards */
+.drill-list{padding:0 16px;display:flex;flex-direction:column;gap:16px}
+.drill-card{background:white;border-radius:12px;overflow:hidden;cursor:pointer;transition:all .2s}
+.drill-card:active{transform:scale(0.98)}
+.drill-card-img{position:relative;aspect-ratio:16/10;background:#001e40;overflow:hidden}
+.drill-card-img-inner{width:100%;height:100%;object-fit:cover;opacity:.8}
+.drill-card-img-placeholder{width:100%;height:100%;display:flex;align-items:center;justify-content:center;font-size:40px}
+.drill-card-img-grad{position:absolute;inset:0;background:linear-gradient(to top,rgba(0,30,64,.8),transparent)}
+.drill-card-img-badge{position:absolute;bottom:12px;left:12px;background:#94f990;color:#002204;padding:3px 10px;border-radius:999px;font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:-.02em}
+.drill-card-body{padding:14px 16px}
+.drill-card-row{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:8px}
+.drill-card-body h3{font-family:'Manrope',sans-serif;font-size:17px;font-weight:700;color:#001e40;letter-spacing:-.02em;line-height:1.2}
+.drill-group{font-size:11px;font-weight:700;color:#737780;text-transform:uppercase;letter-spacing:.08em;flex-shrink:0;padding-top:2px}
+.drill-tags{display:flex;gap:6px;flex-wrap:wrap}
+.dtag{background:#e1e3e4;color:#626566;padding:4px 8px;border-radius:6px;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.02em}
+
+.empty{text-align:center;padding:60px 20px}
+.empty div{font-size:48px;margin-bottom:12px}
+.empty p{font-family:'Manrope',sans-serif;font-size:17px;font-weight:700;color:#001e40;margin-bottom:4px}
+.empty small{font-size:13px;color:#737780}
+
+/* FAB */
+.fab{position:fixed;bottom:28px;right:24px;width:56px;height:56px;border-radius:16px;background:#001e40;color:white;border:none;font-size:26px;cursor:pointer;z-index:40;display:flex;align-items:center;justify-content:center;box-shadow:0 8px 32px rgba(0,30,64,.3);transition:transform .15s;font-weight:300}
+.fab:active{transform:scale(.9)}
+
+/* bottom nav */
+.bottom-nav{position:fixed;bottom:0;width:100%;z-index:50;background:rgba(243,243,246,.8);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);box-shadow:0 -4px 24px rgba(26,28,30,.06)}
+.bottom-nav-inner{display:flex;justify-content:space-around;align-items:center;height:80px;padding:0 16px;max-width:480px;margin:0 auto}
+.nav-item{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:8px 16px;border-radius:12px;cursor:pointer;transition:transform .15s;text-decoration:none;gap:3px}
+.nav-item.active{background:#003366;color:white}
+.nav-item:not(.active){color:#737780}
+.nav-item svg{width:22px;height:22px}
+.nav-item span{font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.08em;font-family:'Inter',sans-serif}
+
+/* editor screen */
+.editor-main{flex:1;overflow-y:auto;padding:20px 16px 40px;display:flex;flex-direction:column;gap:20px;background:#f9f9fc;max-width:480px;margin:0 auto;width:100%}
+.editor-section-label{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:#43474f;font-family:'Inter',sans-serif;margin-bottom:6px}
+
+/* canvas */
+.canvas-wrap{position:relative;width:100%;aspect-ratio:16/10;background:#f0f0f0;border-radius:16px;overflow:hidden;box-shadow:inset 0 2px 8px rgba(0,0,0,.2)}
+canvas#drawCanvas{position:absolute;inset:0;width:100%;height:100%;touch-action:none;cursor:crosshair}
+.canvas-float-bar{display:flex;align-items:center;gap:6px;background:white;border-radius:16px;padding:10px 14px;box-shadow:0 2px 12px rgba(0,30,64,.1);white-space:nowrap;flex-wrap:wrap;margin-top:10px}
+.ftool{background:none;border:none;width:40px;height:40px;border-radius:10px;display:flex;align-items:center;justify-content:center;cursor:pointer;color:#43474f;font-size:18px;transition:all .12s;flex-shrink:0}
+.ftool.active{background:#001e40;color:white}
+.fcolor{width:28px;height:28px;border-radius:50%;border:2.5px solid transparent;cursor:pointer;flex-shrink:0;transition:transform .1s}
+.fcolor.active{border-color:#001e40;transform:scale(1.2)}
+.fbar-sep{width:1px;height:20px;background:#e2e2e5;flex-shrink:0}
+@media(min-width:420px){.field-row{grid-template-columns:1fr 1fr}}
+
+/* form fields */
+.field-group{display:flex;flex-direction:column;gap:6px}
+.field-lbl{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:#737780;font-family:'Inter',sans-serif;margin-bottom:2px}
+.field-group input,.field-group textarea,.field-group select{padding:16px;border-radius:14px;background:white;border:none;outline:none;font-size:16px;color:#1a1c1e;font-family:'Inter',sans-serif;resize:none;line-height:1.6;box-shadow:0 1px 4px rgba(0,30,64,.06);min-height:52px}
+.field-group input::placeholder,.field-group textarea::placeholder{color:#737780}
+.field-group select{appearance:none}
+.field-row{display:grid;grid-template-columns:1fr;gap:14px}
+.deploy-btn{width:100%;padding:18px;border-radius:14px;background:linear-gradient(135deg,#001e40 0%,#003366 100%);color:white;border:none;font-family:'Manrope',sans-serif;font-size:17px;font-weight:700;cursor:pointer;box-shadow:0 8px 24px rgba(0,30,64,.25);letter-spacing:-.02em;transition:transform .15s}
+.deploy-btn:active{transform:scale(.98)}
+
+/* detail view */
+.detail-scroll{flex:1;overflow-y:auto;background:#f3f3f6}.detail-scroll-inner{max-width:480px;margin:0 auto}
+.detail-hero{background:linear-gradient(160deg,#001e40 0%,#002d5c 60%,#003d7a 100%)}.detail-hero-inner{max-width:480px;margin:0 auto;padding:20px 20px 28px}
+.detail-hero-pills{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px}
+.detail-hero-pill{background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.18);border-radius:999px;padding:5px 12px;font-size:11px;font-weight:600;color:rgba(255,255,255,.9);font-family:'Inter',sans-serif}
+.detail-hero-pill.green{background:#94f990;border-color:#94f990;color:#002204}
+.detail-hero-name{font-family:'Manrope',sans-serif;font-size:26px;font-weight:800;color:white;letter-spacing:-.03em;line-height:1.2}
+.detail-body{padding:16px;display:flex;flex-direction:column;gap:10px;max-width:480px;margin:0 auto}
+.detail-block{background:white;border-radius:16px;overflow:hidden}
+.detail-block-label{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.12em;color:#737780;font-family:'Inter',sans-serif;padding:14px 16px 0}
+.detail-block-content{padding:6px 16px 14px;font-size:15px;color:#1a1c1e;line-height:1.7;white-space:pre-wrap;font-family:'Inter',sans-serif}
+.detail-tags{display:flex;gap:6px;flex-wrap:wrap;padding:8px 16px 14px}
+.detail-tag{background:#f0f2f7;color:#3d5a78;padding:5px 12px;border-radius:999px;font-size:12px;font-weight:600;font-family:'Inter',sans-serif}
+.detail-row2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.detail-diagram-wrap{background:white;border-radius:16px;overflow:hidden}
+.detail-diagram-img{width:100%;aspect-ratio:16/10;object-fit:cover;display:block}
+.detail-diagram-empty{aspect-ratio:16/10;background:linear-gradient(135deg,#001e40,#002d5c);display:flex;align-items:center;justify-content:center;position:relative}
+.detail-diagram-empty .pg{position:absolute;inset:0;background-image:linear-gradient(rgba(255,255,255,.04) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.04) 1px,transparent 1px);background-size:32px 32px}
+.detail-diagram-empty span{color:rgba(255,255,255,.3);font-size:12px;font-weight:600;letter-spacing:.12em;text-transform:uppercase;font-family:'Inter',sans-serif;position:relative}
+.detail-export-btn{margin:4px 16px 24px;width:calc(100% - 32px);padding:16px;border-radius:14px;background:#94f990;color:#002204;border:none;font-family:'Manrope',sans-serif;font-size:15px;font-weight:700;cursor:pointer;letter-spacing:-.01em}
+.export-btn-green{display:flex;align-items:center;gap:8px;background:#94f990;color:#002204;padding:9px 18px;border-radius:999px;font-size:13px;font-weight:700;cursor:pointer;border:none;font-family:'Inter',sans-serif}
+</style>
+</head>
+<body>
+
+<!-- LIBRARY -->
+<div class="screen active" id="screen-library">
+  <header style="height:0;padding:0;min-height:0;overflow:hidden"></header>
+  <main style="flex:1;overflow-y:auto">
+    <div class="lib-head">
+      <h2>Zbirka vaj</h2>
+      
+    </div>
+    <div class="search-wrap">
+      <svg width="16" height="16" fill="none" viewBox="0 0 16 16"><circle cx="7" cy="7" r="5" stroke="currentColor" stroke-width="1.5"/><path d="m11 11 3 3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+      <input type="text" id="searchInput" placeholder="Išči po imenu, kategoriji..." oninput="renderLibrary()">
+    </div>
+    <div class="chips" id="chipsRow">
+      <button class="chip active" onclick="setFilter('',this)">Vse vaje</button>
+      <button class="chip" onclick="setFilter('Ogrevanje',this)">Ogrevanje</button>
+      <button class="chip" onclick="setFilter('Dinamična tehnika',this)">Dinamična tehnika</button>
+      <button class="chip" onclick="setFilter('Igralna oblika',this)">Igralna oblika</button>
+    </div>
+    <div class="drill-list" id="drillList"></div>
+    <div style="height:16px"></div>
+  </main>
+  <button class="fab" onclick="newDrill()">+</button>
+  
+</div>
+
+<!-- EDITOR -->
+<div class="screen" id="screen-form">
+  <header>
+    <button class="back-btn" onclick="goLibrary()">&#8592;</button>
+    <div style="flex:1;text-align:center">
+      <div class="header-title" id="formTitle" style="font-size:17px">Nova vaja</div>
+    </div>
+    <button id="deleteBtn" onclick="deleteDrill()" style="display:none;background:none;border:none;color:#ba1a1a;font-size:14px;font-weight:600;cursor:pointer;font-family:'Inter',sans-serif">Izbriši</button>
+  </header>
+  <div class="editor-main">
+
+    <!-- Canvas -->
+    <div>
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
+        <div class="editor-section-label">Taktični načrt</div>
+      </div>
+      <div class="canvas-wrap">
+        <canvas id="drawCanvas"></canvas>
+      </div>
+      <!-- toolbar below canvas, scrollable -->
+      <div style="overflow-x:auto;-webkit-overflow-scrolling:touch;padding-bottom:2px">
+        <div class="canvas-float-bar" style="margin-top:10px;width:max-content">
+          <button class="ftool active" id="tool-pen" onclick="setTool('pen')" title="Prostoročna črta">
+            <svg width="15" height="15" viewBox="0 0 15 15" fill="none"><path d="M2 12 Q4 6 8 5 Q11 4 13 3" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" fill="none"/></svg>
+          </button>
+          <button class="ftool" id="tool-pen-arrow" onclick="setTool('pen-arrow')" title="Prostoročna puščica">
+            <svg width="15" height="15" viewBox="0 0 15 15" fill="none"><path d="M2 12 Q4 6 8 5 Q11 4 13 3" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" fill="none"/><path d="M13 3 L10 4 M13 3 L12 6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+          </button>
+          <button class="ftool" id="tool-dash" onclick="setTool('dash')" title="Črtkana črta">
+            <svg width="15" height="15" viewBox="0 0 15 15" fill="none"><path d="M2 12 Q4 6 8 5 Q11 4 13 3" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-dasharray="2.5 2.5" fill="none"/></svg>
+          </button>
+          <button class="ftool" id="tool-dash-arrow" onclick="setTool('dash-arrow')" title="Črtkana puščica">
+            <svg width="15" height="15" viewBox="0 0 15 15" fill="none"><path d="M2 12 Q4 6 8 5 Q11 4 13 3" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-dasharray="2.5 2.5" fill="none"/><path d="M13 3 L10 4 M13 3 L12 6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+          </button>
+          <button class="ftool" id="tool-wavy" onclick="setTool('wavy')" title="Vijugasta črta">
+            <svg width="15" height="15" viewBox="0 0 15 15" fill="none"><path d="M1 10 Q3 7 5 10 Q7 13 9 10 Q11 7 13 10" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" fill="none"/></svg>
+          </button>
+          <button class="ftool" id="tool-wavy-arrow" onclick="setTool('wavy-arrow')" title="Vijugasta puščica">
+            <svg width="15" height="15" viewBox="0 0 15 15" fill="none"><path d="M1 10 Q3 7 5 10 Q7 13 9 10 Q11 7 13 10" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" fill="none"/><path d="M13 10 L11 8 M13 10 L11 12" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+          </button>
+          <button class="ftool" id="tool-eraser" onclick="setTool('eraser')" title="Brisalo">
+            <svg width="15" height="15" viewBox="0 0 15 15" fill="none"><path d="M3 12h9M5.5 4l5.5 5.5M3 10l3.5-6 5.5 5.5-2.5 2.5H4l-1-1z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </button>
+          <div class="fbar-sep"></div>
+          <div class="fcolor" style="background:#001e40" onclick="setColor('#001e40',this)"></div>
+          <div class="fcolor active" style="background:#94f990" onclick="setColor('#94f990',this)"></div>
+          <div class="fcolor" style="background:#ff6b6b" onclick="setColor('#ff6b6b',this)"></div>
+          <div class="fcolor" style="background:#ffd93d" onclick="setColor('#ffd93d',this)"></div>
+          <div class="fcolor" style="background:#a7c8ff" onclick="setColor('#a7c8ff',this)"></div>
+          <div class="fbar-sep"></div>
+          <button class="ftool" onclick="clearCanvas()" title="Pobriši">
+            <svg width="16" height="16" viewBox="0 0 16 16"><path d="M2 4h12M5 4V3a1 1 0 011-1h4a1 1 0 011 1v1M6 8v4M10 8v4M3 4l1 9a1 1 0 001 1h6a1 1 0 001-1l1-9" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" fill="none"/></svg>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Drill Name -->
+    <div class="field-group">
+      <div class="field-lbl">Ime vaje</div>
+      <input type="text" id="f_ime" placeholder="npr. Kroži in podaj">
+    </div>
+
+    <!-- Skupina + Kategorija -->
+    <div class="field-row">
+      <div class="field-group">
+        <div class="field-lbl">Skupina</div>
+        <input type="text" id="f_skupina" placeholder="U8" style="font-family:'Manrope',sans-serif;font-weight:700;font-size:17px">
+      </div>
+      <div class="field-group">
+        <div class="field-lbl">Kategorija</div>
+        <div style="position:relative">
+          <select id="f_kategorija" style="padding-right:36px;width:100%">
+            <option value="">— izberi —</option>
+            <option>Ogrevanje</option>
+            <option>Dinamična tehnika</option>
+            <option>Igralna oblika</option>
+          </select>
+          <svg style="position:absolute;right:12px;top:50%;transform:translateY(-50%);pointer-events:none;color:#737780" width="14" height="14" fill="none" viewBox="0 0 16 16"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </div>
+      </div>
+    </div>
+
+    <!-- Ključne teme + Datum -->
+    <div class="field-row">
+      <div class="field-group">
+        <div class="field-lbl">Ključne teme</div>
+        <input type="text" id="f_teme" placeholder="podaja, gibanje">
+      </div>
+      <div class="field-group">
+        <div class="field-lbl">Datum</div>
+        <input type="date" id="f_datum">
+      </div>
+    </div>
+
+    <!-- Igralci -->
+    <div class="field-group">
+      <div class="field-lbl">Število igralcev</div>
+      <input type="text" id="f_igralci" placeholder="npr. 8–12">
+    </div>
+
+    <!-- Potek -->
+    <div class="field-group">
+      <div class="field-lbl">Potek vaje</div>
+      <textarea id="f_potek" rows="5" placeholder="Opiši kako vaja poteka..."></textarea>
+    </div>
+
+    <!-- Coaching + Variacije + Nasveti -->
+    <div class="field-group">
+      <div class="field-lbl">Coaching points</div>
+      <textarea id="f_coaching" rows="4" placeholder="Ključne točke za trenerja..."></textarea>
+    </div>
+    <div class="field-row">
+      <div class="field-group">
+        <div class="field-lbl">Variacije</div>
+        <textarea id="f_variacije" rows="4" placeholder="Variacije..."></textarea>
+      </div>
+      <div class="field-group">
+        <div class="field-lbl">Nasveti</div>
+        <textarea id="f_nasveti" rows="4" placeholder="Nasveti..."></textarea>
+      </div>
+    </div>
+
+    <button class="deploy-btn" onclick="saveDrill(false)">Shrani v zbirko</button>
+    <button onclick="saveDrill(true)" style="width:100%;padding:18px;border-radius:14px;background:#94f990;color:#002204;border:none;font-family:'Manrope',sans-serif;font-size:15px;font-weight:700;cursor:pointer;letter-spacing:-.01em">Shrani &amp; izvozi PDF</button>
+    <div style="height:8px"></div>
+  </div>
+</div>
+
+<!-- DETAIL / VIEW -->
+<div class="screen" id="screen-view">
+  <header>
+    <button class="back-btn" onclick="goLibrary()">&#8592;</button>
+    <div style="flex:1"></div>
+    <div style="display:flex;gap:8px;align-items:center">
+      <button onclick="editDrill()" style="background:#f3f3f6;border:none;border-radius:8px;padding:8px 16px;font-size:13px;font-weight:600;cursor:pointer;color:#001e40;font-family:'Inter',sans-serif">Uredi</button>
+      <button class="export-btn-green" onclick="exportPDF()">
+        <svg width="13" height="13" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M12 10v6m0 0l-3-3m3 3l3-3M3 17V19a2 2 0 002 2h14a2 2 0 002-2v-2"/></svg>
+        PDF
+      </button>
+    </div>
+  </header>
+  <div class="detail-scroll">
+    <div class="detail-hero">
+      <div class="detail-hero-inner">
+      <div class="detail-hero-pills">
+        <span class="detail-hero-pill green" id="v_kat_pill"></span>
+        <span class="detail-hero-pill" id="v_skupina_pill"></span>
+        <span id="v_teme_pills"></span>
+      </div>
+      <div class="detail-hero-name" id="v_ime"></div>
+      </div>
+    </div>
+    <div class="detail-body">
+      <div class="detail-diagram-wrap">
+        <div class="detail-diagram-empty" id="v_diag_placeholder" style="display:flex">
+          <div class="pg"></div>
+          <span>Diagram</span>
+        </div>
+        <img id="v_diagram" class="detail-diagram-img" src="" alt="" style="display:none">
+      </div>
+
+      <div class="detail-block">
+        <div class="detail-block-label">Potek vaje</div>
+        <div class="detail-block-content" id="v_potek"></div>
+      </div>
+      <div class="detail-block">
+        <div class="detail-block-label">Coaching points</div>
+        <div class="detail-block-content" id="v_coaching"></div>
+      </div>
+      <div class="detail-row2">
+        <div class="detail-block">
+          <div class="detail-block-label">Variacije</div>
+          <div class="detail-block-content" id="v_variacije"></div>
+        </div>
+        <div class="detail-block">
+          <div class="detail-block-label">Nasveti</div>
+          <div class="detail-block-content" id="v_nasveti"></div>
+        </div>
+      </div>
+      <div class="detail-row2">
+        <div class="detail-block">
+          <div class="detail-block-label">Datum nastanka</div>
+          <div class="detail-block-content" id="v_datum"></div>
+        </div>
+        <div class="detail-block">
+          <div class="detail-block-label">Število igralcev</div>
+          <div class="detail-block-content" id="v_igralci"></div>
+        </div>
+      </div>
+    </div>
+    <div style="max-width:480px;margin:0 auto"><button class="detail-export-btn" onclick="exportPDF()">Izvozi PDF</button></div>
+  </div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script>
+let drills=[],currentId=null,editingId=null,activeFilter='';
+let currentTool='pen',currentColor='#001e40';
+let isDrawing=false,startX,startY,snapshot;
+let canvas,ctx;
+const KEY='miha_drills_v4';
+const CAT_ICON={'Ogrevanje':'🔥','Dinamična tehnika':'⚙️','Igralna oblika':'🎯',};
+const CAT_COLOR={'Ogrevanje':'#f97316','Dinamična tehnika':'#3b82f6','Igralna oblika':'#22c55e','Prosta igra':'#a855f7'};
+
+function loadDrills(){try{drills=JSON.parse(localStorage.getItem(KEY))||[];}catch(e){drills=[];}renderLibrary();}
+function saveDrills(){try{localStorage.setItem(KEY,JSON.stringify(drills));}catch(e){}}
+
+function setFilter(cat,el){
+  activeFilter=cat;
+  document.querySelectorAll('.chip').forEach(b=>b.classList.remove('active'));
+  el.classList.add('active');
+  renderLibrary();
+}
+
+function renderLibrary(){
+  const q=(document.getElementById('searchInput').value||'').toLowerCase();
+  const filtered=drills.filter(d=>
+    (!activeFilter||d.kategorija===activeFilter)&&
+    ((d.ime||'').toLowerCase().includes(q)||(d.kategorija||'').toLowerCase().includes(q)||(d.teme||'').toLowerCase().includes(q))
+  );
+  const list=document.getElementById('drillList');
+  if(!filtered.length){
+    list.innerHTML=`<div class="empty"><div>${drills.length?'🔍':'⚽'}</div><p>${drills.length?'Ni rezultatov':'Še ni vaj'}</p><small>${drills.length?'Poskusi drugo iskanje':'Dodaj prvo vajo z gumbom +'}</small></div>`;
+    return;
+  }
+  list.innerHTML=filtered.map(d=>{
+    const icon=CAT_ICON[d.kategorija]||'⚽';
+    const col=CAT_COLOR[d.kategorija]||'#001e40';
+    const hasImg=d.diagram&&d.diagram.length>100;
+    const imgArea=hasImg
+      ?`<img class="drill-card-img-inner" src="${d.diagram}" alt="" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover">`
+      :`<div class="drill-card-img-placeholder" style="background:#e8e8ea">${icon}</div>`;
+    return `<div class="drill-card" onclick="viewDrill('${d.id}')">
+      <div class="drill-card-img" style="position:relative">
+        ${imgArea}
+        <div class="drill-card-img-grad"></div>
+        ${d.kategorija?`<span class="drill-card-img-badge">${d.kategorija}</span>`:''}
+      </div>
+      <div class="drill-card-body">
+        <div class="drill-card-row">
+          <h3>${d.ime||'Brez imena'}</h3>
+          <span class="drill-group">${d.skupina||''}</span>
+        </div>
+        <div class="drill-tags">
+          ${d.teme?d.teme.split(',').map(t=>`<span class="dtag">${t.trim()}</span>`).join(''):''}
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function showScreen(id){document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));document.getElementById('screen-'+id).classList.add('active');window.scrollTo(0,0);}
+
+function newDrill(){
+  editingId=null;
+  document.getElementById('formTitle').textContent='Nova vaja';
+  document.getElementById('deleteBtn').style.display='none';
+  ['ime','skupina','teme','potek','igralci','coaching','variacije','nasveti'].forEach(f=>{const el=document.getElementById('f_'+f);if(el)el.value='';});
+  document.getElementById('f_kategorija').value='';
+  document.getElementById('f_datum').value=new Date().toISOString().split('T')[0];
+  showScreen('form');
+  setTimeout(()=>{initCanvas();clearCanvas();},60);
+}
+
+function editDrill(){
+  const d=drills.find(x=>x.id===currentId);if(!d)return;
+  editingId=currentId;
+  document.getElementById('formTitle').textContent='Uredi vajo';
+  document.getElementById('deleteBtn').style.display='block';
+  ['ime','skupina','kategorija','teme','potek','datum','igralci','coaching','variacije','nasveti'].forEach(f=>{const el=document.getElementById('f_'+f);if(el)el.value=d[f]||'';});
+  showScreen('form');
+  setTimeout(()=>{initCanvas();if(d.diagram){const img=new Image();img.onload=()=>ctx.drawImage(img,0,0,canvas.width,canvas.height);img.src=d.diagram;}else clearCanvas();},60);
+}
+
+function saveDrill(andPDF){
+  const d={id:editingId||Date.now().toString(),ime:document.getElementById('f_ime').value.trim()||'Brez imena',skupina:document.getElementById('f_skupina').value,kategorija:document.getElementById('f_kategorija').value,teme:document.getElementById('f_teme').value,potek:document.getElementById('f_potek').value,datum:document.getElementById('f_datum').value,igralci:document.getElementById('f_igralci').value,coaching:document.getElementById('f_coaching').value,variacije:document.getElementById('f_variacije').value,nasveti:document.getElementById('f_nasveti').value,diagram:canvas?canvas.toDataURL('image/png'):'',};
+  if(editingId){const i=drills.findIndex(x=>x.id===editingId);if(i>=0)drills[i]=d;}else drills.unshift(d);
+  saveDrills();currentId=d.id;renderView(d);showScreen('view');
+  if(andPDF)setTimeout(()=>doExportPDF(d),300);
+}
+
+function deleteDrill(){if(!confirm('Izbriši vajo?'))return;drills=drills.filter(x=>x.id!==editingId);saveDrills();goLibrary();}
+function viewDrill(id){currentId=id;const d=drills.find(x=>x.id===id);if(!d)return;renderView(d);showScreen('view');}
+
+function renderView(d){
+  const sp=document.getElementById('v_skupina_pill');
+  const kp=document.getElementById('v_kat_pill');
+  kp.textContent=d.kategorija||''; kp.style.display=d.kategorija?'':'none';
+  sp.textContent=d.skupina||''; sp.style.display=d.skupina?'':'none';
+  const tp=document.getElementById('v_teme_pills');
+  if(tp) tp.innerHTML=d.teme?d.teme.split(',').map(t=>`<span class="detail-hero-pill" style="display:inline-block">${t.trim()}</span>`).join(''):'';
+  document.getElementById('v_ime').textContent=d.ime||'';
+  document.getElementById('v_potek').textContent=d.potek||'—';
+  document.getElementById('v_coaching').textContent=d.coaching||'—';
+  document.getElementById('v_variacije').textContent=d.variacije||'—';
+  document.getElementById('v_nasveti').textContent=d.nasveti||'—';
+  document.getElementById('v_datum').textContent=d.datum||'—';
+  document.getElementById('v_igralci').textContent=d.igralci||'—';
+
+  const img=document.getElementById('v_diagram');
+  const ph=document.getElementById('v_diag_placeholder');
+  if(d.diagram&&d.diagram.length>100){img.src=d.diagram;img.style.display='block';ph.style.display='none';}
+  else{img.style.display='none';ph.style.display='flex';}
+}
+function goLibrary(){renderLibrary();showScreen('library');}
+function exportPDF(){const d=drills.find(x=>x.id===currentId);if(d)doExportPDF(d);}
+
+function doExportPDF(d){
+  try{
+    const{jsPDF}=window.jspdf;
+    const pdf=new jsPDF({orientation:'portrait',unit:'mm',format:'a5'});
+    const W=148,H=210,M=10;
+    const CW=W-M*2; // content width = 128mm
+    // Colors — light, readable
+    const navy=[0,30,64];
+    const headerBg=[235,242,250];  // very light blue-grey
+    const metaBg=[245,247,250];    // near-white
+    const labelCol=[100,120,145];  // muted blue-grey for labels
+    const textCol=[30,35,40];      // near-black for body
+    const titleCol=[0,30,64];      // navy for headings
+
+    // Helper: section label + body text block
+    function sectionBlock(label,text,yPos,maxW){
+      pdf.setFontSize(7);pdf.setFont(undefined,'bold');pdf.setTextColor(...labelCol);
+      pdf.text(label.toUpperCase(),M,yPos);
+      pdf.setFontSize(10);pdf.setFont(undefined,'normal');pdf.setTextColor(...textCol);
+      const lines=pdf.splitTextToSize(text||'—',maxW);
+      pdf.text(lines,M,yPos+5);
+      return yPos+5+lines.length*5.5;
+    }
+
+    // ── PAGE 1 ──────────────────────────────────────────
+    // Header: light blue-grey bar, navy text
+    pdf.setFillColor(...headerBg);
+    pdf.roundedRect(M,M,CW,20,2,2,'F');
+    // Ime vaje (left, takes ~75%)
+    const skupW=28;
+    const imeW=CW-skupW-3;
+    pdf.setFontSize(7);pdf.setFont(undefined,'bold');pdf.setTextColor(...labelCol);
+    pdf.text('IME VAJE',M+3,M+5.5);
+    pdf.setFontSize(12);pdf.setFont(undefined,'bold');pdf.setTextColor(...titleCol);
+    const imeTxt=pdf.splitTextToSize(d.ime||'',imeW-6);
+    pdf.text(imeTxt[0]||'',M+3,M+13);
+    // Skupina (right, narrow box)
+    pdf.setFillColor(220,232,245);
+    pdf.roundedRect(M+imeW+3,M,skupW,20,2,2,'F');
+    pdf.setFontSize(6);pdf.setFont(undefined,'bold');pdf.setTextColor(...labelCol);
+    pdf.text('SKUPINA',M+imeW+5,M+5.5);
+    pdf.setFontSize(11);pdf.setFont(undefined,'bold');pdf.setTextColor(...titleCol);
+    pdf.text(d.skupina||'',M+imeW+5,M+13);
+
+    let y=M+25;
+
+    // Kategorija + Ključne teme — two light boxes side by side
+    const katW=Math.round(CW*0.38), temeW=CW-katW-3;
+    pdf.setFillColor(...metaBg);
+    pdf.roundedRect(M,y,katW,13,2,2,'F');
+    pdf.roundedRect(M+katW+3,y,temeW,13,2,2,'F');
+    pdf.setFontSize(6.5);pdf.setFont(undefined,'bold');pdf.setTextColor(...labelCol);
+    pdf.text('KATEGORIJA',M+3,y+4.5);
+    pdf.text('KLJUČNE TEME',M+katW+6,y+4.5);
+    pdf.setFontSize(9);pdf.setFont(undefined,'normal');pdf.setTextColor(...textCol);
+    pdf.text(d.kategorija||'—',M+3,y+10);
+    pdf.text(pdf.splitTextToSize(d.teme||'—',temeW-6)[0],M+katW+6,y+10);
+    y+=17;
+
+    // Diagram label
+    pdf.setFontSize(7);pdf.setFont(undefined,'bold');pdf.setTextColor(...labelCol);
+    pdf.text('DIAGRAM',M,y+4);
+    y+=7;
+
+    // Diagram box — taller, light background
+    const dH=72;
+    pdf.setFillColor(250,251,253);pdf.setDrawColor(210,218,228);pdf.setLineWidth(0.3);
+    pdf.roundedRect(M,y,CW,dH,2,2,'FD');
+    if(d.diagram&&d.diagram.length>100){
+      try{pdf.addImage(d.diagram,'PNG',M+1,y+1,CW-2,dH-2);}catch(e){}
+    }
+    y+=dH+6;
+
+    // Potek vaje
+    pdf.setFontSize(7);pdf.setFont(undefined,'bold');pdf.setTextColor(...labelCol);
+    pdf.text('POTEK VAJE',M,y);y+=5;
+    pdf.setFontSize(10);pdf.setFont(undefined,'normal');pdf.setTextColor(...textCol);
+    pdf.setLineHeightFactor(1.5);
+    const potekLines=pdf.splitTextToSize(d.potek||'—',CW);
+    pdf.text(potekLines,M,y);
+
+    // ── PAGE 2 ──────────────────────────────────────────
+    pdf.addPage();
+    y=M;
+
+    // Datum + Igralci
+    const hw=(CW-3)/2;
+    pdf.setFillColor(...metaBg);
+    pdf.roundedRect(M,y,hw,13,2,2,'F');
+    pdf.roundedRect(M+hw+3,y,hw,13,2,2,'F');
+    pdf.setFontSize(6.5);pdf.setFont(undefined,'bold');pdf.setTextColor(...labelCol);
+    pdf.text('DATUM NASTANKA',M+3,y+4.5);
+    pdf.text('ŠTEVILO IGRALCEV',M+hw+6,y+4.5);
+    pdf.setFontSize(9);pdf.setFont(undefined,'normal');pdf.setTextColor(...textCol);
+    pdf.text(d.datum||'—',M+3,y+10);
+    pdf.text(d.igralci||'—',M+hw+6,y+10);
+    y+=20;
+
+    // Coaching, Variacije, Nasveti
+    pdf.setLineHeightFactor(1.5);
+    [['Coaching points',d.coaching],['Variacije',d.variacije],['Nasveti',d.nasveti]].forEach(([lbl,val])=>{
+      y=sectionBlock(lbl,val,y,CW)+5;
+    });
+
+    // Footer
+    pdf.setFontSize(7.5);pdf.setTextColor(180,185,195);
+    pdf.text('Miha Perpar',W/2,H-6,{align:'center'});
+
+    pdf.save((d.ime||'vaja').replace(/\s+/g,'_')+'.pdf');
+  }catch(e){alert('PDF napaka: '+e.message);}
+}
+
+function initCanvas(){
+  canvas=document.getElementById('drawCanvas');
+  const wrap=canvas.parentElement;
+  canvas.width=wrap.clientWidth;
+  canvas.height=wrap.clientHeight||Math.round(wrap.clientWidth*9/16);
+  ctx=canvas.getContext('2d');ctx.lineCap='round';ctx.lineJoin='round';ctx.lineWidth=2.5;ctx.strokeStyle=currentColor;
+  canvas.removeEventListener('pointerdown',startDraw);
+  canvas.addEventListener('pointerdown',startDraw);
+  canvas.addEventListener('pointermove',drawing);
+  canvas.addEventListener('pointerup',endDraw);
+  canvas.addEventListener('pointerleave',endDraw);
+}
+function getPos(e){const r=canvas.getBoundingClientRect();return{x:(e.clientX-r.left)*(canvas.width/r.width),y:(e.clientY-r.top)*(canvas.height/r.height)};}
+// freehand points buffer for pen-based tools
+let freePoints=[];
+
+function applyStrokeStyle(tool){
+  ctx.strokeStyle=currentColor;
+  ctx.lineWidth=2.5;
+  ctx.lineCap='round';
+  ctx.lineJoin='round';
+  if(tool==='dash'||tool==='dash-arrow'){ctx.setLineDash([6,5]);}
+  else{ctx.setLineDash([]);}
+}
+
+function drawArrowHead(pts){
+  if(pts.length<2)return;
+  const last=pts[pts.length-1];
+  // direction from a few points back for smooth angle
+  const ref=pts[Math.max(0,pts.length-8)];
+  const a=Math.atan2(last.y-ref.y,last.x-ref.x);
+  const h=13;
+  ctx.setLineDash([]);
+  ctx.beginPath();
+  ctx.moveTo(last.x,last.y);
+  ctx.lineTo(last.x-h*Math.cos(a-0.42),last.y-h*Math.sin(a-0.42));
+  ctx.moveTo(last.x,last.y);
+  ctx.lineTo(last.x-h*Math.cos(a+0.42),last.y-h*Math.sin(a+0.42));
+  ctx.stroke();
+}
+
+function redrawFreePoints(tool){
+  if(freePoints.length<2)return;
+  if(tool==='wavy'||tool==='wavy-arrow'){
+    // Step 1: resample freePoints at fixed pixel intervals (fixes speed-dependence)
+    const STEP=2; // resample every 2px
+    const resampled=[freePoints[0]];
+    let carry=0;
+    for(let i=1;i<freePoints.length;i++){
+      const dx=freePoints[i].x-freePoints[i-1].x;
+      const dy=freePoints[i].y-freePoints[i-1].y;
+      const seg=Math.sqrt(dx*dx+dy*dy);
+      let t=carry;
+      while(t<seg){
+        const r=t/seg;
+        resampled.push({x:freePoints[i-1].x+dx*r, y:freePoints[i-1].y+dy*r});
+        t+=STEP;
+      }
+      carry=t-seg;
+    }
+    resampled.push(freePoints[freePoints.length-1]);
+
+    // Step 2: apply sinusoidal offset perpendicular to path
+    const amp=8, waveLen=36;
+    const TAIL=50; // px of straight tail for arrow
+    const totalLen=(resampled.length-1)*STEP;
+    const wPts=resampled.map((pt,i)=>{
+      const d=i*STEP;
+      const distFromEnd=totalLen-d;
+      // Linear taper over full TAIL length — guaranteed offset=0 at endpoint
+      const taper=(tool==='wavy-arrow'&&distFromEnd<TAIL)
+        ?(distFromEnd/TAIL)
+        :1;
+      const offset=amp*Math.sin((d/waveLen)*Math.PI*2)*taper;
+      // tangent from neighbours
+      const i0=Math.max(0,i-3),i1=Math.min(resampled.length-1,i+3);
+      const tx=resampled[i1].x-resampled[i0].x;
+      const ty=resampled[i1].y-resampled[i0].y;
+      const len=Math.sqrt(tx*tx+ty*ty)||1;
+      return {x:pt.x+(-ty/len)*offset, y:pt.y+(tx/len)*offset};
+    });
+
+    // Step 3: draw smoothed wavy path
+    ctx.beginPath();
+    ctx.moveTo(wPts[0].x,wPts[0].y);
+    for(let i=1;i<wPts.length-1;i++){
+      const mx=(wPts[i].x+wPts[i+1].x)/2;
+      const my=(wPts[i].y+wPts[i+1].y)/2;
+      ctx.quadraticCurveTo(wPts[i].x,wPts[i].y,mx,my);
+    }
+    ctx.lineTo(wPts[wPts.length-1].x,wPts[wPts.length-1].y);
+    ctx.stroke();
+
+    // Step 4: arrowhead aligned to the straight tail
+    if(tool==='wavy-arrow'){
+      const last=resampled[resampled.length-1];
+      // find ref point TAIL px back in resampled array
+      const refIdx=Math.max(0,resampled.length-1-Math.round(TAIL/STEP));
+      const ref=resampled[refIdx];
+      const a=Math.atan2(last.y-ref.y,last.x-ref.x);
+      const h=13;
+      ctx.setLineDash([]);
+      ctx.beginPath();
+      ctx.moveTo(last.x,last.y);
+      ctx.lineTo(last.x-h*Math.cos(a-0.42),last.y-h*Math.sin(a-0.42));
+      ctx.moveTo(last.x,last.y);
+      ctx.lineTo(last.x-h*Math.cos(a+0.42),last.y-h*Math.sin(a+0.42));
+      ctx.stroke();
+      return;
+    }
+  } else {
+    // smooth freehand via quadratic bezier
+    ctx.beginPath();
+    ctx.moveTo(freePoints[0].x,freePoints[0].y);
+    for(let i=1;i<freePoints.length-1;i++){
+      const mx=(freePoints[i].x+freePoints[i+1].x)/2;
+      const my=(freePoints[i].y+freePoints[i+1].y)/2;
+      ctx.quadraticCurveTo(freePoints[i].x,freePoints[i].y,mx,my);
+    }
+    const l=freePoints[freePoints.length-1];
+    ctx.lineTo(l.x,l.y);
+    ctx.stroke();
+  }
+  if(tool==='pen-arrow'||tool==='dash-arrow'){
+    drawArrowHead(freePoints);
+  }
+}
+
+function isFreehand(t){return t==='pen'||t==='pen-arrow'||t==='dash'||t==='dash-arrow'||t==='wavy'||t==='wavy-arrow';}
+
+function startDraw(e){
+  e.preventDefault();
+  isDrawing=true;
+  const p=getPos(e);
+  startX=p.x;startY=p.y;
+  freePoints=[p];
+  snapshot=ctx.getImageData(0,0,canvas.width,canvas.height);
+  if(currentTool==='eraser'){ctx.beginPath();ctx.moveTo(p.x,p.y);}
+}
+
+function drawing(e){
+  if(!isDrawing)return;
+  e.preventDefault();
+  const p=getPos(e);
+  if(currentTool==='eraser'){
+    ctx.strokeStyle='#f0f0f0';ctx.lineWidth=32;ctx.setLineDash([]);
+    ctx.lineCap='round';ctx.lineJoin='round';
+    ctx.lineTo(p.x,p.y);ctx.stroke();
+    ctx.beginPath();ctx.moveTo(p.x,p.y);
+    // show eraser cursor overlay
+    showEraserCursor(p.x,p.y);
+    return;
+  }
+  if(isFreehand(currentTool)){
+    freePoints.push(p);
+    ctx.putImageData(snapshot,0,0);
+    applyStrokeStyle(currentTool);
+    redrawFreePoints(currentTool);
+  }
+}
+
+function showEraserCursor(x,y){
+  const r=canvas.getBoundingClientRect();
+  const scaleX=r.width/canvas.width, scaleY=r.height/canvas.height;
+  let el=document.getElementById('eraser-cursor');
+  if(!el){
+    el=document.createElement('div');
+    el.id='eraser-cursor';
+    el.style.cssText='position:absolute;pointer-events:none;border:2px solid rgba(100,100,100,0.5);border-radius:50%;background:rgba(150,150,150,0.12);transform:translate(-50%,-50%);transition:none;z-index:10';
+    canvas.parentElement.style.position='relative';
+    canvas.parentElement.appendChild(el);
+  }
+  const size=32*scaleX;
+  el.style.width=size+'px';el.style.height=size+'px';
+  el.style.left=(x*scaleX)+'px';el.style.top=(y*scaleY)+'px';
+  el.style.display='block';
+}
+function hideEraserCursor(){
+  const el=document.getElementById('eraser-cursor');
+  if(el)el.style.display='none';
+}
+function endDraw(e){
+  if(!isDrawing)return;
+  isDrawing=false;
+  if(currentTool==='eraser'){hideEraserCursor();return;}
+  if(isFreehand(currentTool)){
+    const p=getPos(e);
+    if(p.x!==startX||p.y!==startY)freePoints.push(p);
+    ctx.putImageData(snapshot,0,0);
+    applyStrokeStyle(currentTool);
+    redrawFreePoints(currentTool);
+    freePoints=[];
+  }
+}
+
+function setTool(t){
+  currentTool=t;
+  hideEraserCursor();
+  document.querySelectorAll('.ftool').forEach(b=>b.classList.remove('active'));
+  const el=document.getElementById('tool-'+t);
+  if(el)el.classList.add('active');
+}
+function setColor(c,el){currentColor=c;document.querySelectorAll('.fcolor').forEach(d=>d.classList.remove('active'));el.classList.add('active');if(currentTool==='eraser')setTool('pen');}
+function clearCanvas(){if(ctx)ctx.clearRect(0,0,canvas.width,canvas.height);}
+
+loadDrills();
+</script>
+</body>
+</html>
