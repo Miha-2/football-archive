@@ -609,6 +609,13 @@ async function deleteDrill(){
 }
 function viewDrill(id){currentId=id;const d=drills.find(x=>x.id===id);if(!d)return;renderView(d);showScreen('view');}
 
+function formatDate(s){
+  if(!s)return'';
+  const [y,m,d]=s.split('-');
+  if(!y||!m||!d)return s;
+  return`${d}. ${m}. ${y}`;
+}
+
 function renderView(d){
   const kp=document.getElementById('v_kat_pill');
   kp.textContent=d.kategorija||''; kp.style.display=d.kategorija?'':'none';
@@ -624,7 +631,7 @@ function renderView(d){
   const dm=document.getElementById('v_datum_meta');
   const im=document.getElementById('v_igralci_meta');
   if(sm){document.getElementById('v_skupina_val').textContent=d.skupina||'';sm.style.display=d.skupina?'flex':'none';}
-  if(dm){document.getElementById('v_datum_val').textContent=d.datum||'';dm.style.display=d.datum?'flex':'none';}
+  if(dm){document.getElementById('v_datum_val').textContent=formatDate(d.datum);dm.style.display=d.datum?'flex':'none';}
   if(im){document.getElementById('v_igralci_val').textContent=d.igralci||'';im.style.display=d.igralci?'flex':'none';}
   const meta=document.getElementById('v_meta');
   if(meta)meta.style.display=(d.skupina||d.datum||d.igralci)?'flex':'none';
@@ -661,7 +668,7 @@ async function doExportPDF(d){
 
   const metaParts=[];
   if(d.skupina) metaParts.push(`<span>👥 ${d.skupina}</span>`);
-  if(d.datum) metaParts.push(`<span>📅 ${d.datum}</span>`);
+  if(d.datum) metaParts.push(`<span>📅 ${formatDate(d.datum)}</span>`);
   if(d.igralci) metaParts.push(`<span>🔢 ${d.igralci}</span>`);
 
   const html=`<div style="width:${W}px;background:white;padding:${M}px;box-sizing:border-box;font-family:Arial,sans-serif">
