@@ -82,7 +82,7 @@ main{padding-bottom:24px;max-width:480px;margin:0 auto;width:100%}
 .editor-section-label{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:#43474f;font-family:'Inter',sans-serif;margin-bottom:6px}
 
 /* canvas */
-.canvas-wrap{position:relative;width:100%;aspect-ratio:16/10;background:#f0f0f0;border-radius:16px;overflow:hidden;box-shadow:inset 0 2px 8px rgba(0,0,0,.2)}
+.canvas-wrap{position:relative;width:100%;aspect-ratio:4/3;background:#f0f0f0;border-radius:16px;overflow:hidden;box-shadow:inset 0 2px 8px rgba(0,0,0,.2)}
 canvas#drawCanvas{position:absolute;inset:0;width:100%;height:100%;touch-action:none;cursor:crosshair}
 .canvas-float-bar{display:flex;align-items:center;gap:6px;background:white;border-radius:16px;padding:10px 14px;box-shadow:0 2px 12px rgba(0,30,64,.1);white-space:nowrap;flex-wrap:wrap;margin-top:10px}
 .ftool{background:none;border:none;width:40px;height:40px;border-radius:10px;display:flex;align-items:center;justify-content:center;cursor:pointer;color:#43474f;font-size:18px;transition:all .12s;flex-shrink:0}
@@ -194,6 +194,9 @@ canvas#drawCanvas{position:absolute;inset:0;width:100%;height:100%;touch-action:
           </button>
           <button class="ftool" id="tool-eraser" onclick="setTool('eraser')" title="Brisalo">
             <svg width="15" height="15" viewBox="0 0 15 15" fill="none"><path d="M3 12h9M5.5 4l5.5 5.5M3 10l3.5-6 5.5 5.5-2.5 2.5H4l-1-1z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </button>
+          <button class="ftool" id="undo-btn" onclick="undo()" title="Razveljavi" style="opacity:0.35">
+            <svg width="15" height="15" viewBox="0 0 15 15" fill="none"><path d="M3 7a5 5 0 1 0 1.5-3.5L2 2" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/><path d="M2 2v3.5H5.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
           </button>
           <div class="fbar-sep"></div>
           <div class="fcolor" style="background:#001e40" onclick="setColor('#001e40',this)"></div>
@@ -353,6 +356,8 @@ let drills=[],currentId=null,editingId=null,activeFilter='';
 let currentTool='pen',currentColor='#001e40';
 let isDrawing=false,startX,startY,snapshot;
 let canvas,ctx;
+let undoStack=[];
+const MAX_UNDO=20;
 const KEY='miha_drills_v4';
 const CAT_ICON={'Ogrevanje':'🔥','Dinamična tehnika':'⚙️','Igralna oblika':'🎯',};
 const CAT_COLOR={'Ogrevanje':'#f97316','Dinamična tehnika':'#3b82f6','Igralna oblika':'#22c55e','Prosta igra':'#a855f7'};
@@ -583,6 +588,8 @@ function initCanvas(){
   canvas.addEventListener('pointermove',drawing);
   canvas.addEventListener('pointerup',endDraw);
   canvas.addEventListener('pointerleave',endDraw);
+  undoStack=[];
+  const ubtn=document.getElementById('undo-btn');if(ubtn)ubtn.style.opacity='0.35';
 }
 function getPos(e){const r=canvas.getBoundingClientRect();return{x:(e.clientX-r.left)*(canvas.width/r.width),y:(e.clientY-r.top)*(canvas.height/r.height)};}
 // freehand points buffer for pen-based tools
@@ -753,10 +760,20 @@ function hideEraserCursor(){
   const el=document.getElementById('eraser-cursor');
   if(el)el.style.display='none';
 }
+function saveUndo(){
+  undoStack.push(ctx.getImageData(0,0,canvas.width,canvas.height));
+  if(undoStack.length>MAX_UNDO)undoStack.shift();
+  document.getElementById('undo-btn').style.opacity=undoStack.length?'1':'0.35';
+}
+function undo(){
+  if(!undoStack.length)return;
+  ctx.putImageData(undoStack.pop(),0,0);
+  document.getElementById('undo-btn').style.opacity=undoStack.length?'1':'0.35';
+}
 function endDraw(e){
   if(!isDrawing)return;
   isDrawing=false;
-  if(currentTool==='eraser'){hideEraserCursor();return;}
+  if(currentTool==='eraser'){hideEraserCursor();saveUndo();return;}
   if(isFreehand(currentTool)){
     const p=getPos(e);
     if(p.x!==startX||p.y!==startY)freePoints.push(p);
@@ -764,6 +781,7 @@ function endDraw(e){
     applyStrokeStyle(currentTool);
     redrawFreePoints(currentTool);
     freePoints=[];
+    saveUndo();
   }
 }
 
@@ -775,7 +793,7 @@ function setTool(t){
   if(el)el.classList.add('active');
 }
 function setColor(c,el){currentColor=c;document.querySelectorAll('.fcolor').forEach(d=>d.classList.remove('active'));el.classList.add('active');if(currentTool==='eraser')setTool('pen');}
-function clearCanvas(){if(ctx)ctx.clearRect(0,0,canvas.width,canvas.height);}
+function clearCanvas(){if(ctx){saveUndo();ctx.clearRect(0,0,canvas.width,canvas.height);}}
 
 loadDrills();
 </script>
