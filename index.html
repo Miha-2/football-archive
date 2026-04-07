@@ -13,7 +13,7 @@
 <style>
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
 html,body{height:100%;min-height:100dvh}
-body{font-family:'Inter',sans-serif;background:#f9f9fc;color:#1a1c1e;overscroll-behavior:none}
+body{font-family:'Inter',sans-serif;background:#f3f4f8;color:#1a1c1e;overscroll-behavior:none}
 .no-scrollbar::-webkit-scrollbar{display:none}
 .no-scrollbar{-ms-overflow-style:none;scrollbar-width:none}
 .pitch-grid{background-image:linear-gradient(rgba(255,255,255,0.05) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,0.05) 1px,transparent 1px);background-size:40px 40px}
@@ -23,46 +23,49 @@ body{font-family:'Inter',sans-serif;background:#f9f9fc;color:#1a1c1e;overscroll-
 .screen.active{display:flex}
 
 /* header */
-header{background:#f3f3f6;display:flex;align-items:center;justify-content:space-between;padding:0 24px;height:64px;position:sticky;top:0;z-index:50;box-shadow:0 -4px 24px rgba(26,28,30,0.06);transition:transform .25s ease}
-.header-title{font-family:'Manrope',sans-serif;font-size:20px;font-weight:800;color:#001e40;letter-spacing:-0.03em}
+header{background:rgba(255,255,255,.92);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);display:flex;align-items:center;justify-content:space-between;padding:0 20px;height:60px;position:sticky;top:0;z-index:50;border-bottom:1px solid rgba(0,30,64,.07);transition:transform .25s ease}
+.header-title{font-family:'Manrope',sans-serif;font-size:17px;font-weight:800;color:#001e40;letter-spacing:-0.02em}
 .avatar{width:32px;height:32px;border-radius:50%;background:#003366;display:flex;align-items:center;justify-content:center;font-size:10px;color:white;font-weight:700}
-.back-btn{display:flex;align-items:center;justify-content:center;width:36px;height:36px;border-radius:50%;background:#f3f3f6;border:none;color:#001e40;font-size:18px;cursor:pointer}
+.back-btn{display:flex;align-items:center;gap:4px;height:34px;padding:0 12px 0 6px;border-radius:999px;background:#f0f0f3;border:none;color:#001e40;font-size:13px;font-weight:600;font-family:'Inter',sans-serif;cursor:pointer;transition:background .12s}
+.back-btn:active{background:#e4e4e8}
 
 /* main content */
 main{padding-bottom:24px;max-width:480px;margin:0 auto;width:100%}
 
 /* library */
-.lib-head{padding:24px 16px 8px;display:flex;align-items:center;justify-content:space-between}
-.lib-head h2{font-family:'Manrope',sans-serif;font-size:24px;font-weight:800;color:#001e40;letter-spacing:-0.03em}
-.active-badge{background:#94f990;color:#002204;padding:4px 12px;border-radius:999px;font-size:11px;font-weight:700;font-family:'Inter',sans-serif;text-transform:uppercase;letter-spacing:.06em}
+.lib-head{padding:28px 16px 12px;display:flex;align-items:center;justify-content:space-between}
+.lib-head h2{font-family:'Manrope',sans-serif;font-size:28px;font-weight:800;color:#001e40;letter-spacing:-0.04em}
+.drill-count{background:#f0f0f3;color:#737780;padding:3px 10px;border-radius:999px;font-size:11px;font-weight:700;font-family:'Inter',sans-serif;margin-left:8px;vertical-align:middle}
 
 /* search */
 .search-wrap{padding:0 16px 12px;position:relative}
-.search-wrap svg{position:absolute;left:28px;top:calc(50% - 6px);transform:translateY(-50%);color:#737780;pointer-events:none}
-.search-wrap input{width:100%;padding:14px 16px 14px 44px;border-radius:12px;background:#f3f3f6;border:none;outline:none;font-size:14px;color:#1a1c1e;font-family:'Inter',sans-serif}
-.search-wrap input::placeholder{color:#737780}
+.search-wrap svg{position:absolute;left:28px;top:50%;transform:translateY(-50%);color:#737780;pointer-events:none}
+.search-wrap input{width:100%;padding:13px 16px 13px 44px;border-radius:14px;background:white;border:1.5px solid transparent;outline:none;font-size:14px;color:#1a1c1e;font-family:'Inter',sans-serif;box-shadow:0 1px 4px rgba(0,30,64,.06);transition:border-color .15s,box-shadow .15s}
+.search-wrap input:focus{border-color:rgba(0,30,64,.2);box-shadow:0 0 0 3px rgba(0,30,64,.06)}
+.search-wrap input::placeholder{color:#9fa3ab}
 
 /* filter chips */
-.chips{display:flex;gap:8px;padding:0 16px 16px;overflow-x:auto}
+.chips{display:flex;gap:6px;padding:0 16px 16px;overflow-x:auto}
 .chips::-webkit-scrollbar{display:none}
-.chip{background:#e8e8ea;color:#43474f;padding:8px 16px;border-radius:999px;font-size:12px;font-weight:700;white-space:nowrap;cursor:pointer;border:none;font-family:'Inter',sans-serif;flex-shrink:0;transition:all .15s}
-.chip.active{background:#001e40;color:white}
+.chip{background:white;color:#43474f;padding:8px 16px;border-radius:999px;font-size:12px;font-weight:600;white-space:nowrap;cursor:pointer;border:1.5px solid #e4e4e8;font-family:'Inter',sans-serif;flex-shrink:0;transition:all .15s;box-shadow:0 1px 3px rgba(0,0,0,.04)}
+.chip:active{transform:scale(.95)}
+.chip.active{background:#001e40;color:white;border-color:#001e40;box-shadow:0 2px 8px rgba(0,30,64,.2)}
 
 /* drill cards */
-.drill-list{padding:0 16px;display:flex;flex-direction:column;gap:16px}
-.drill-card{background:white;border-radius:12px;overflow:hidden;cursor:pointer;transition:transform .18s ease, box-shadow .18s ease}
-.drill-card:active{transform:scale(0.97);box-shadow:0 2px 8px rgba(0,30,64,.08)}
-.drill-card-img{position:relative;aspect-ratio:16/10;background:#001e40;overflow:hidden}
-.drill-card-img-inner{width:100%;height:100%;object-fit:cover;opacity:.8}
-.drill-card-img-placeholder{width:100%;height:100%;display:flex;align-items:center;justify-content:center;font-size:40px}
-.drill-card-img-grad{position:absolute;inset:0;background:linear-gradient(to top,rgba(0,10,30,.55) 0%,rgba(0,10,30,.18) 50%,transparent 100%)}
-.drill-card-img-badge{position:absolute;bottom:12px;left:12px;background:#94f990;color:#002204;padding:3px 10px;border-radius:999px;font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:-.02em}
-.drill-card-body{padding:14px 16px}
+.drill-list{padding:0 16px;display:flex;flex-direction:column;gap:14px}
+.drill-card{background:white;border-radius:18px;overflow:hidden;cursor:pointer;transition:transform .18s ease,box-shadow .18s ease;box-shadow:0 2px 12px rgba(0,30,64,.07);animation:fadeUp .22s ease both}
+.drill-card:active{transform:scale(0.97);box-shadow:0 1px 4px rgba(0,30,64,.06)}
+.drill-card-img{position:relative;aspect-ratio:16/9;background:#001e40;overflow:hidden}
+.drill-card-img-inner{width:100%;height:100%;object-fit:cover}
+.drill-card-img-placeholder{width:100%;height:100%;display:flex;align-items:center;justify-content:center;font-size:36px;background:linear-gradient(135deg,#001e40 0%,#002d5c 100%);background-image:linear-gradient(135deg,#001e40 0%,#002d5c 100%),linear-gradient(rgba(255,255,255,.04) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.04) 1px,transparent 1px);background-size:100% 100%,28px 28px,28px 28px}
+.drill-card-img-grad{position:absolute;inset:0;background:linear-gradient(to top,rgba(0,10,30,.6) 0%,rgba(0,10,30,.1) 45%,transparent 100%)}
+.drill-card-img-badge{position:absolute;bottom:12px;left:12px;background:rgba(255,255,255,.15);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);color:white;border:1px solid rgba(255,255,255,.2);padding:4px 10px;border-radius:999px;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.04em}
+.drill-card-body{padding:14px 16px 16px}
 .drill-card-row{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:8px}
-.drill-card-body h3{font-family:'Manrope',sans-serif;font-size:17px;font-weight:700;color:#001e40;letter-spacing:-.02em;line-height:1.2}
-.drill-group{font-size:11px;font-weight:700;color:#737780;text-transform:uppercase;letter-spacing:.08em;flex-shrink:0;padding-top:2px}
-.drill-tags{display:flex;gap:6px;flex-wrap:wrap}
-.dtag{background:#e1e3e4;color:#626566;padding:4px 8px;border-radius:6px;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.02em}
+.drill-card-body h3{font-family:'Manrope',sans-serif;font-size:16px;font-weight:800;color:#001e40;letter-spacing:-.03em;line-height:1.25}
+.drill-group{font-size:11px;font-weight:700;color:#94a3b8;text-transform:uppercase;letter-spacing:.08em;flex-shrink:0;padding-top:2px}
+.drill-tags{display:flex;gap:5px;flex-wrap:wrap}
+.dtag{background:#f0f2f7;color:#4a6080;padding:4px 9px;border-radius:8px;font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.03em}
 
 /* view toggle */
 .view-toggle{display:flex;gap:4px;background:#e8e8ea;border-radius:10px;padding:3px}
@@ -70,22 +73,20 @@ main{padding-bottom:24px;max-width:480px;margin:0 auto;width:100%}
 .view-toggle-btn.active{background:white;color:#001e40;box-shadow:0 1px 3px rgba(0,0,0,.1)}
 
 /* list view rows */
-.drill-list-rows{padding:0 16px;display:flex;flex-direction:column;gap:1px}
-.drill-row{background:white;display:flex;align-items:center;gap:12px;padding:12px 14px;cursor:pointer;transition:background .12s;border-radius:0}
-.drill-row:first-child{border-radius:12px 12px 0 0}
-.drill-row:last-child{border-radius:0 0 12px 12px}
-.drill-row:only-child{border-radius:12px}
+.drill-list-rows{margin:0 16px;display:flex;flex-direction:column;border-radius:16px;overflow:hidden;box-shadow:0 2px 12px rgba(0,30,64,.07)}
+.drill-row{background:white;display:flex;align-items:center;gap:12px;padding:13px 14px;cursor:pointer;transition:background .12s;border-radius:0}
+.drill-row:first-child{border-radius:16px 16px 0 0}
+.drill-row:last-child{border-radius:0 0 16px 16px}
+.drill-row:only-child{border-radius:16px}
 .drill-row:not(:last-child){border-bottom:1px solid #f3f3f6}
-.drill-row:active{background:#f3f3f6}
-.drill-row-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
-.drill-row-name{font-family:'Manrope',sans-serif;font-size:15px;font-weight:700;color:#001e40;flex:1;letter-spacing:-.02em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.drill-row-kat{font-size:11px;font-weight:600;color:#737780;white-space:nowrap;flex-shrink:0}
-.drill-row-date{font-size:11px;color:#b0b4bc;flex-shrink:0;white-space:nowrap}
+.drill-row:active{background:#f5f5f8}
+.drill-row-dot{width:9px;height:9px;border-radius:50%;flex-shrink:0}
+.drill-row-name{font-family:'Manrope',sans-serif;font-size:15px;font-weight:800;color:#001e40;flex:1;letter-spacing:-.03em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.drill-row-kat{font-size:11px;font-weight:600;color:#94a3b8;white-space:nowrap;flex-shrink:0}
 
 /* animations */
 @keyframes fadeUp{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
 @keyframes fadeIn{from{opacity:0}to{opacity:1}}
-.drill-card{animation:fadeUp .22s ease both}
 .drill-row{animation:fadeUp .18s ease both}
 
 /* screen transition */
@@ -93,14 +94,15 @@ main{padding-bottom:24px;max-width:480px;margin:0 auto;width:100%}
 .screen.screen-exit{opacity:0;pointer-events:none}
 .screen.screen-enter{animation:fadeIn .22s ease both}
 
-.empty{text-align:center;padding:60px 20px}
-.empty div{font-size:48px;margin-bottom:12px}
-.empty p{font-family:'Manrope',sans-serif;font-size:17px;font-weight:700;color:#001e40;margin-bottom:4px}
-.empty small{font-size:13px;color:#737780}
+.empty{text-align:center;padding:64px 20px 80px}
+.empty div{font-size:52px;margin-bottom:16px;filter:drop-shadow(0 4px 8px rgba(0,0,0,.1))}
+.empty p{font-family:'Manrope',sans-serif;font-size:18px;font-weight:800;color:#001e40;margin-bottom:6px;letter-spacing:-.02em}
+.empty small{font-size:13px;color:#94a3b8}
 
 /* FAB */
-.fab{position:fixed;bottom:28px;right:24px;width:56px;height:56px;border-radius:16px;background:#001e40;color:white;border:none;font-size:26px;cursor:pointer;z-index:40;display:flex;align-items:center;justify-content:center;box-shadow:0 8px 32px rgba(0,30,64,.3);transition:transform .15s;font-weight:300}
-.fab:active{transform:scale(.9)}
+@keyframes fabIn{from{opacity:0;transform:scale(.7)}to{opacity:1;transform:scale(1)}}
+.fab{position:fixed;bottom:32px;right:20px;width:58px;height:58px;border-radius:18px;background:linear-gradient(145deg,#002a58,#001e40);color:white;border:none;font-size:28px;cursor:pointer;z-index:40;display:flex;align-items:center;justify-content:center;box-shadow:0 8px 24px rgba(0,30,64,.35),0 2px 6px rgba(0,30,64,.2);transition:transform .15s,box-shadow .15s;animation:fabIn .3s cubic-bezier(.175,.885,.32,1.275) both;font-weight:300;line-height:1}
+.fab:active{transform:scale(.9);box-shadow:0 4px 12px rgba(0,30,64,.3)}
 
 /* bottom nav */
 .bottom-nav{position:fixed;bottom:0;width:100%;z-index:50;background:rgba(243,243,246,.8);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);box-shadow:0 -4px 24px rgba(26,28,30,.06)}
@@ -112,25 +114,27 @@ main{padding-bottom:24px;max-width:480px;margin:0 auto;width:100%}
 .nav-item span{font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.08em;font-family:'Inter',sans-serif}
 
 /* editor screen */
-.editor-main{flex:1;overflow-y:auto;padding:20px 16px 40px;display:flex;flex-direction:column;gap:20px;background:#f9f9fc;max-width:480px;margin:0 auto;width:100%}
-.editor-section-label{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:#43474f;font-family:'Inter',sans-serif;margin-bottom:6px}
+.editor-main{flex:1;overflow-y:auto;padding:20px 16px 48px;display:flex;flex-direction:column;gap:20px;background:#f5f5f8;max-width:480px;margin:0 auto;width:100%}
+.editor-section-label{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.12em;color:#94a3b8;font-family:'Inter',sans-serif;margin-bottom:6px}
 
 /* canvas */
-.canvas-wrap{position:relative;width:100%;aspect-ratio:4/3;background:#ffffff;border-radius:16px;overflow:hidden;box-shadow:inset 0 2px 8px rgba(0,0,0,.2)}
+.canvas-wrap{position:relative;width:100%;aspect-ratio:4/3;background:#ffffff;border-radius:18px;overflow:hidden;box-shadow:0 2px 16px rgba(0,30,64,.12),inset 0 1px 0 rgba(255,255,255,.8)}
 canvas#drawCanvas{position:absolute;inset:0;width:100%;height:100%;touch-action:none;cursor:crosshair}
-.canvas-float-bar{display:flex;align-items:center;gap:6px;background:white;border-radius:16px;padding:10px 14px;box-shadow:0 2px 12px rgba(0,30,64,.1);white-space:nowrap;flex-wrap:wrap;margin-top:10px}
-.ftool{background:none;border:none;width:36px;height:36px;border-radius:10px;display:flex;align-items:center;justify-content:center;cursor:pointer;color:#43474f;font-size:18px;transition:all .12s;flex-shrink:0}
-.ftool.active{background:#001e40;color:white}
-.fcolor{width:28px;height:28px;border-radius:50%;border:2.5px solid transparent;cursor:pointer;flex-shrink:0;transition:transform .1s}
-.fcolor.active{border-color:#001e40;transform:scale(1.2)}
-.fbar-sep{width:1px;height:20px;background:#e2e2e5;flex-shrink:0}
+.canvas-float-bar{display:flex;align-items:center;gap:6px;background:white;border-radius:16px;padding:10px 14px;box-shadow:0 2px 12px rgba(0,30,64,.08);white-space:nowrap;flex-wrap:wrap;margin-top:10px}
+.ftool{background:none;border:none;width:36px;height:36px;border-radius:10px;display:flex;align-items:center;justify-content:center;cursor:pointer;color:#6b7280;font-size:18px;transition:all .12s;flex-shrink:0}
+.ftool:active{transform:scale(.9)}
+.ftool.active{background:#001e40;color:white;box-shadow:0 2px 6px rgba(0,30,64,.2)}
+.fcolor{width:26px;height:26px;border-radius:50%;border:2.5px solid transparent;cursor:pointer;flex-shrink:0;transition:transform .1s,border-color .1s}
+.fcolor.active{border-color:#001e40;transform:scale(1.25)}
+.fbar-sep{width:1px;height:20px;background:#e8e8ec;flex-shrink:0}
 @media(min-width:420px){.field-row{grid-template-columns:1fr 1fr}}
 
 /* form fields */
 .field-group{display:flex;flex-direction:column;gap:6px}
-.field-lbl{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:#737780;font-family:'Inter',sans-serif;margin-bottom:2px}
-.field-group input,.field-group textarea,.field-group select{padding:16px;border-radius:14px;background:white;border:none;outline:none;font-size:16px;color:#1a1c1e;font-family:'Inter',sans-serif;resize:none;line-height:1.6;box-shadow:0 1px 4px rgba(0,30,64,.06);min-height:52px}
-.field-group input::placeholder,.field-group textarea::placeholder{color:#737780}
+.field-lbl{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:#94a3b8;font-family:'Inter',sans-serif;margin-bottom:2px}
+.field-group input,.field-group textarea,.field-group select{padding:15px 16px;border-radius:14px;background:white;border:1.5px solid transparent;outline:none;font-size:15px;color:#1a1c1e;font-family:'Inter',sans-serif;resize:none;line-height:1.6;box-shadow:0 1px 4px rgba(0,30,64,.06);min-height:52px;transition:border-color .15s,box-shadow .15s}
+.field-group input:focus,.field-group textarea:focus,.field-group select:focus{border-color:rgba(0,30,64,.25);box-shadow:0 0 0 3px rgba(0,30,64,.07)}
+.field-group input::placeholder,.field-group textarea::placeholder{color:#b0b4bc}
 .field-group select{appearance:none}
 .field-row{display:grid;grid-template-columns:1fr;gap:14px}
 .deploy-btn{width:100%;padding:18px;border-radius:14px;background:linear-gradient(135deg,#001e40 0%,#003366 100%);color:white;border:none;font-family:'Manrope',sans-serif;font-size:17px;font-weight:700;cursor:pointer;box-shadow:0 8px 24px rgba(0,30,64,.25);letter-spacing:-.02em;transition:transform .15s}
@@ -138,33 +142,41 @@ canvas#drawCanvas{position:absolute;inset:0;width:100%;height:100%;touch-action:
 
 /* detail view */
 .detail-scroll{flex:1;overflow-y:auto;background:#f3f3f6}.detail-scroll-inner{max-width:480px;margin:0 auto}
-.detail-hero{background:linear-gradient(160deg,#001e40 0%,#002d5c 60%,#003d7a 100%)}.detail-hero-inner{max-width:480px;margin:0 auto;padding:20px 20px 28px}
-.detail-hero-pills{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px;align-items:center}
-.detail-hero-pill{background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.18);border-radius:999px;padding:5px 12px;font-size:11px;font-weight:600;color:rgba(255,255,255,.9);font-family:'Inter',sans-serif}
-.detail-hero-pill.green{background:#94f990;border-color:#94f990;color:#002204}
-.detail-hero-name{font-family:'Manrope',sans-serif;font-size:26px;font-weight:800;color:white;letter-spacing:-.03em;line-height:1.2}
-.detail-body{padding:16px;display:flex;flex-direction:column;gap:10px;max-width:480px;margin:0 auto}
-.detail-block{background:white;border-radius:16px;overflow:hidden}
-.detail-block-label{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.12em;color:#737780;font-family:'Inter',sans-serif;padding:14px 16px 0}
-.detail-block-content{padding:6px 16px 14px;font-size:15px;color:#1a1c1e;line-height:1.7;white-space:pre-wrap;font-family:'Inter',sans-serif}
+.detail-hero{background:linear-gradient(160deg,#001020 0%,#001e40 45%,#002d5c 100%);position:relative;overflow:hidden}
+.detail-hero::before{content:'';position:absolute;inset:0;background-image:linear-gradient(rgba(255,255,255,.04) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.04) 1px,transparent 1px);background-size:36px 36px;pointer-events:none}
+.detail-hero-inner{max-width:480px;margin:0 auto;padding:24px 20px 32px;position:relative}
+.detail-hero-pills{display:flex;gap:7px;flex-wrap:wrap;margin-bottom:16px;align-items:center}
+.detail-hero-pill{background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.15);border-radius:999px;padding:5px 12px;font-size:11px;font-weight:600;color:rgba(255,255,255,.85);font-family:'Inter',sans-serif}
+.detail-hero-pill.green{background:#94f990;border-color:#94f990;color:#002204;font-weight:700}
+.detail-hero-name{font-family:'Manrope',sans-serif;font-size:30px;font-weight:800;color:white;letter-spacing:-.04em;line-height:1.15}
+@keyframes heroIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+.detail-hero-inner{animation:heroIn .28s ease both}
+.detail-body{padding:14px 14px;display:flex;flex-direction:column;gap:10px;max-width:480px;margin:0 auto}
+.detail-block{background:white;border-radius:16px;overflow:hidden;box-shadow:0 1px 4px rgba(0,30,64,.05)}
+.detail-block-label{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.14em;color:#94a3b8;font-family:'Inter',sans-serif;padding:14px 16px 0}
+.detail-block-content{padding:6px 16px 16px;font-size:15px;color:#1a1c1e;line-height:1.75;white-space:pre-wrap;font-family:'Inter',sans-serif}
 .detail-tags{display:flex;gap:6px;flex-wrap:wrap;padding:8px 16px 14px}
 .detail-tag{background:#f0f2f7;color:#3d5a78;padding:5px 12px;border-radius:999px;font-size:12px;font-weight:600;font-family:'Inter',sans-serif}
 .detail-row2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
-.detail-diagram-wrap{background:white;border-radius:16px;overflow:hidden}
+.detail-diagram-wrap{background:white;border-radius:16px;overflow:hidden;box-shadow:0 1px 4px rgba(0,30,64,.05)}
 .detail-diagram-img{width:100%;aspect-ratio:4/3;object-fit:cover;display:block}
-.detail-diagram-empty{aspect-ratio:4/3;background:linear-gradient(135deg,#001e40,#002d5c);display:flex;align-items:center;justify-content:center;position:relative}
-.detail-diagram-empty .pg{position:absolute;inset:0;background-image:linear-gradient(rgba(255,255,255,.04) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.04) 1px,transparent 1px);background-size:32px 32px}
-.detail-diagram-empty span{color:rgba(255,255,255,.3);font-size:12px;font-weight:600;letter-spacing:.12em;text-transform:uppercase;font-family:'Inter',sans-serif;position:relative}
+.detail-diagram-empty{aspect-ratio:4/3;background:linear-gradient(135deg,#001020,#002040);display:flex;align-items:center;justify-content:center;position:relative}
+.detail-diagram-empty .pg{position:absolute;inset:0;background-image:linear-gradient(rgba(255,255,255,.05) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.05) 1px,transparent 1px);background-size:32px 32px}
+.detail-diagram-empty span{color:rgba(255,255,255,.25);font-size:11px;font-weight:700;letter-spacing:.16em;text-transform:uppercase;font-family:'Inter',sans-serif;position:relative}
 .detail-export-btn{margin:4px 16px 24px;width:calc(100% - 32px);padding:16px;border-radius:14px;background:#94f990;color:#002204;border:none;font-family:'Manrope',sans-serif;font-size:15px;font-weight:700;cursor:pointer;letter-spacing:-.01em}
-.export-btn-green{display:flex;align-items:center;gap:8px;background:#94f990;color:#002204;padding:9px 18px;border-radius:999px;font-size:13px;font-weight:700;cursor:pointer;border:none;font-family:'Inter',sans-serif}
+.export-btn-green{display:flex;align-items:center;gap:7px;background:#94f990;color:#002204;padding:8px 16px;border-radius:999px;font-size:13px;font-weight:700;cursor:pointer;border:none;font-family:'Inter',sans-serif;transition:transform .12s,box-shadow .12s;box-shadow:0 2px 8px rgba(0,180,0,.2)}
+.export-btn-green:active{transform:scale(.95)}
 /* login */
-.login-wrap{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:100dvh;padding:32px 24px;background:#f9f9fc}
-.login-box{width:100%;max-width:360px;display:flex;flex-direction:column;gap:16px}
-.login-logo{font-family:'Manrope',sans-serif;font-size:28px;font-weight:800;color:#001e40;letter-spacing:-.03em;text-align:center;margin-bottom:8px}
-.login-sub{font-size:14px;color:#737780;text-align:center;margin-top:-8px;margin-bottom:8px}
-.login-input{padding:16px;border-radius:14px;background:white;border:none;outline:none;font-size:16px;color:#1a1c1e;font-family:'Inter',sans-serif;box-shadow:0 1px 4px rgba(0,30,64,.08);width:100%}
-.login-btn{width:100%;padding:18px;border-radius:14px;background:#001e40;color:white;border:none;font-family:'Manrope',sans-serif;font-size:17px;font-weight:700;cursor:pointer;letter-spacing:-.02em;transition:transform .15s}
-.login-btn:active{transform:scale(.98)}
+.login-wrap{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:100dvh;padding:32px 24px;background:linear-gradient(170deg,#001020 0%,#001e40 45%,#f9f9fc 45%)}
+.login-box{width:100%;max-width:340px;display:flex;flex-direction:column;gap:14px}
+.login-logo{font-family:'Manrope',sans-serif;font-size:30px;font-weight:800;color:white;letter-spacing:-.04em;text-align:center;margin-bottom:4px}
+.login-logomark{width:52px;height:52px;background:#94f990;border-radius:16px;display:flex;align-items:center;justify-content:center;margin:0 auto 16px;box-shadow:0 8px 24px rgba(148,249,144,.3)}
+.login-sub{font-size:13px;color:rgba(255,255,255,.6);text-align:center;margin-top:-4px;margin-bottom:16px}
+.login-card{background:white;border-radius:24px;padding:28px 24px;display:flex;flex-direction:column;gap:14px;box-shadow:0 24px 60px rgba(0,0,0,.2)}
+.login-input{padding:15px 16px;border-radius:12px;background:#f5f5f8;border:1.5px solid transparent;outline:none;font-size:15px;color:#1a1c1e;font-family:'Inter',sans-serif;box-shadow:none;width:100%;transition:border-color .15s}
+.login-input:focus{border-color:rgba(0,30,64,.2);background:white}
+.login-btn{width:100%;padding:17px;border-radius:12px;background:linear-gradient(135deg,#001e40,#003066);color:white;border:none;font-family:'Manrope',sans-serif;font-size:16px;font-weight:700;cursor:pointer;letter-spacing:-.02em;transition:transform .15s,box-shadow .15s;box-shadow:0 4px 16px rgba(0,30,64,.3)}
+.login-btn:active{transform:scale(.98);box-shadow:0 2px 8px rgba(0,30,64,.2)}
 .login-err{color:#ba1a1a;font-size:13px;text-align:center;min-height:18px}
 .login-toggle{text-align:center;font-size:13px;color:#737780}
 .login-toggle a{color:#001e40;font-weight:600;cursor:pointer;text-decoration:none}
@@ -176,13 +188,18 @@ canvas#drawCanvas{position:absolute;inset:0;width:100%;height:100%;touch-action:
 <div id="screen-login" style="display:none">
   <div class="login-wrap">
     <div class="login-box">
-      <div class="login-logo">⚽ Arhiv vaj</div>
+      <div class="login-logomark">
+        <svg width="26" height="26" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="10" stroke="#002204" stroke-width="2"/><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2z" fill="none"/><path d="M4.93 4.93L8 8m8 8l3.07 3.07M19.07 4.93L16 8M8 16l-3.07 3.07" stroke="#002204" stroke-width="1.5" stroke-linecap="round"/><circle cx="12" cy="12" r="3" stroke="#002204" stroke-width="1.5"/></svg>
+      </div>
+      <div class="login-logo">Arhiv vaj</div>
       <div class="login-sub" id="login-sub">Prijavi se v svoj račun</div>
-      <input class="login-input" type="email" id="login-email" placeholder="E-pošta" autocomplete="email">
-      <input class="login-input" type="password" id="login-pass" placeholder="Geslo" autocomplete="current-password">
-      <div class="login-err" id="login-err"></div>
-      <button class="login-btn" id="login-btn" onclick="doAuth()">Prijava</button>
-      <div class="login-toggle" id="login-toggle">Nimaš računa? <a onclick="toggleAuthMode()">Registracija</a></div>
+      <div class="login-card">
+        <input class="login-input" type="email" id="login-email" placeholder="E-pošta" autocomplete="email">
+        <input class="login-input" type="password" id="login-pass" placeholder="Geslo" autocomplete="current-password">
+        <div class="login-err" id="login-err"></div>
+        <button class="login-btn" id="login-btn" onclick="doAuth()">Prijava</button>
+        <div class="login-toggle" id="login-toggle">Nimaš računa? <a onclick="toggleAuthMode()">Registracija</a></div>
+      </div>
     </div>
   </div>
 </div>
@@ -192,7 +209,10 @@ canvas#drawCanvas{position:absolute;inset:0;width:100%;height:100%;touch-action:
   <header style="height:0;padding:0;min-height:0;overflow:hidden"></header>
   <main style="flex:1;overflow-y:auto">
     <div class="lib-head">
-      <h2>Arhiv vaj</h2>
+      <div style="display:flex;align-items:baseline;gap:0">
+        <h2>Vaje</h2>
+        <span class="drill-count" id="drillCount"></span>
+      </div>
       <div style="display:flex;align-items:center;gap:10px">
         <div class="view-toggle">
           <button class="view-toggle-btn active" id="toggle-grid" onclick="setViewMode('grid')" title="Mreža">
@@ -202,7 +222,7 @@ canvas#drawCanvas{position:absolute;inset:0;width:100%;height:100%;touch-action:
             <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><rect x="1" y="2" width="12" height="2" rx="1" fill="currentColor"/><rect x="1" y="6" width="12" height="2" rx="1" fill="currentColor"/><rect x="1" y="10" width="12" height="2" rx="1" fill="currentColor"/></svg>
           </button>
         </div>
-        <button onclick="doLogout()" style="background:none;border:none;font-size:12px;font-weight:600;color:#737780;cursor:pointer;font-family:'Inter',sans-serif;padding:4px 0">Odjava</button>
+        <button onclick="doLogout()" style="background:none;border:none;font-size:12px;font-weight:600;color:#94a3b8;cursor:pointer;font-family:'Inter',sans-serif;padding:4px 0">Odjava</button>
       </div>
     </div>
     <div class="search-wrap">
@@ -226,14 +246,14 @@ canvas#drawCanvas{position:absolute;inset:0;width:100%;height:100%;touch-action:
 <!-- EDITOR -->
 <div class="screen" id="screen-form">
   <header>
-    <button class="back-btn" onclick="goLibrary()" style="display:flex;align-items:center;gap:5px;width:auto;padding:0 10px 0 4px;border-radius:20px;font-size:13px;font-weight:600;font-family:'Inter',sans-serif;color:#001e40;background:#e8e8ea;border:none;height:34px;cursor:pointer">
+    <button class="back-btn" onclick="goLibrary()">
       <svg width="16" height="16" fill="none" viewBox="0 0 16 16"><path d="M10 12L6 8l4-4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
       Nazaj
     </button>
     <div style="flex:1;text-align:center">
-      <div class="header-title" id="formTitle" style="font-size:17px">Nova vaja</div>
+      <div class="header-title" id="formTitle">Nova vaja</div>
     </div>
-    <button id="saveBtn" onclick="saveDrill(false)" style="background:#001e40;border:none;border-radius:20px;padding:0 16px;height:34px;color:white;font-size:13px;font-weight:600;cursor:pointer;font-family:'Inter',sans-serif">Shrani</button>
+    <button id="saveBtn" onclick="saveDrill(false)" style="background:linear-gradient(135deg,#001e40,#003066);border:none;border-radius:999px;padding:0 18px;height:34px;color:white;font-size:13px;font-weight:700;cursor:pointer;font-family:'Manrope',sans-serif;box-shadow:0 2px 8px rgba(0,30,64,.25);transition:transform .12s">Shrani</button>
   </header>
   <div class="editor-main">
 
@@ -374,8 +394,8 @@ canvas#drawCanvas{position:absolute;inset:0;width:100%;height:100%;touch-action:
       </div>
     </div>
 
-    <button onclick="saveDrill(false)" style="width:100%;padding:18px;border-radius:14px;background:linear-gradient(135deg,#001e40 0%,#003366 100%);color:white;border:none;font-family:'Manrope',sans-serif;font-size:17px;font-weight:700;cursor:pointer;box-shadow:0 8px 24px rgba(0,30,64,.25);letter-spacing:-.02em">Shrani v zbirko</button>
-    <button id="deleteBtn" onclick="deleteDrill()" style="display:none;width:100%;padding:18px;border-radius:14px;background:#fff0f0;color:#ba1a1a;border:none;font-family:'Manrope',sans-serif;font-size:15px;font-weight:700;cursor:pointer;letter-spacing:-.01em">Izbriši vajo</button>
+    <button onclick="saveDrill(false)" style="width:100%;padding:18px;border-radius:16px;background:linear-gradient(135deg,#001e40 0%,#003066 100%);color:white;border:none;font-family:'Manrope',sans-serif;font-size:17px;font-weight:800;cursor:pointer;box-shadow:0 8px 24px rgba(0,30,64,.25);letter-spacing:-.02em;transition:transform .15s,box-shadow .15s">Shrani v zbirko</button>
+    <button id="deleteBtn" onclick="deleteDrill()" style="display:none;width:100%;padding:16px;border-radius:16px;background:#fff5f5;color:#c0392b;border:1.5px solid #fdd;font-family:'Manrope',sans-serif;font-size:15px;font-weight:700;cursor:pointer;letter-spacing:-.01em;transition:background .15s">Izbriši vajo</button>
     <div style="height:8px"></div>
   </div>
 </div>
@@ -383,15 +403,15 @@ canvas#drawCanvas{position:absolute;inset:0;width:100%;height:100%;touch-action:
 <!-- DETAIL / VIEW -->
 <div class="screen" id="screen-view">
   <header>
-    <button class="back-btn" onclick="goLibrary()" style="display:flex;align-items:center;gap:5px;width:auto;padding:0 10px 0 4px;border-radius:20px;font-size:13px;font-weight:600;font-family:'Inter',sans-serif;color:#001e40;background:#e8e8ea;border:none;height:34px;cursor:pointer">
+    <button class="back-btn" onclick="goLibrary()">
       <svg width="16" height="16" fill="none" viewBox="0 0 16 16"><path d="M10 12L6 8l4-4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
       Nazaj
     </button>
     <div style="flex:1"></div>
     <div style="display:flex;gap:8px;align-items:center">
-      <button onclick="editDrill()" style="background:#f3f3f6;border:none;border-radius:8px;padding:8px 16px;font-size:13px;font-weight:600;cursor:pointer;color:#001e40;font-family:'Inter',sans-serif">Uredi</button>
+      <button onclick="editDrill()" style="background:#f0f0f3;border:none;border-radius:999px;padding:0 16px;height:34px;font-size:13px;font-weight:600;cursor:pointer;color:#001e40;font-family:'Inter',sans-serif;transition:background .12s">Uredi</button>
       <button class="export-btn-green" onclick="exportPDF()">
-        <svg width="15" height="15" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5M16.5 12L12 16.5m0 0L7.5 12m4.5 4.5V3"/></svg>
+        <svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.2"><path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5M16.5 12L12 16.5m0 0L7.5 12m4.5 4.5V3"/></svg>
         PDF
       </button>
     </div>
@@ -433,17 +453,17 @@ canvas#drawCanvas{position:absolute;inset:0;width:100%;height:100%;touch-action:
           <div class="detail-block-content" id="v_nasveti"></div>
         </div>
       </div>
-      <!-- meta info: subtle, secondary -->
-      <div id="v_meta" style="display:flex;gap:20px;padding:4px 2px 8px;flex-wrap:wrap;justify-content:center">
-        <span id="v_skupina_meta" style="display:none;align-items:center;gap:5px;font-size:12px;color:#737780;font-family:'Inter',sans-serif">
+      <!-- meta info -->
+      <div id="v_meta" style="display:flex;gap:8px;padding:4px 2px 8px;flex-wrap:wrap;justify-content:center">
+        <span id="v_skupina_meta" style="display:none;align-items:center;gap:5px;font-size:12px;font-weight:600;color:#4a6080;font-family:'Inter',sans-serif;background:white;padding:6px 12px;border-radius:999px;box-shadow:0 1px 4px rgba(0,30,64,.07)">
           <svg width="13" height="13" fill="none" viewBox="0 0 16 16" stroke="currentColor" stroke-width="1.6"><circle cx="6" cy="5" r="2.5"/><path d="M1 13c0-2.5 2-4 5-4s5 1.5 5 4"/><circle cx="11.5" cy="5" r="2"/><path d="M14 13c0-1.8-1.2-3-2.5-3.5"/></svg>
           <span id="v_skupina_val"></span>
         </span>
-        <span id="v_datum_meta" style="display:none;align-items:center;gap:5px;font-size:12px;color:#737780;font-family:'Inter',sans-serif">
+        <span id="v_datum_meta" style="display:none;align-items:center;gap:5px;font-size:12px;font-weight:600;color:#4a6080;font-family:'Inter',sans-serif;background:white;padding:6px 12px;border-radius:999px;box-shadow:0 1px 4px rgba(0,30,64,.07)">
           <svg width="13" height="13" fill="none" viewBox="0 0 16 16" stroke="currentColor" stroke-width="1.6"><rect x="1.5" y="3" width="13" height="11" rx="2"/><path d="M5 1.5v3M11 1.5v3M1.5 7h13"/></svg>
           <span id="v_datum_val"></span>
         </span>
-        <span id="v_igralci_meta" style="display:none;align-items:center;gap:5px;font-size:12px;color:#737780;font-family:'Inter',sans-serif">
+        <span id="v_igralci_meta" style="display:none;align-items:center;gap:5px;font-size:12px;font-weight:600;color:#4a6080;font-family:'Inter',sans-serif;background:white;padding:6px 12px;border-radius:999px;box-shadow:0 1px 4px rgba(0,30,64,.07)">
           <svg width="13" height="13" fill="none" viewBox="0 0 16 16" stroke="currentColor" stroke-width="1.6"><path d="M8 2a3 3 0 100 6 3 3 0 000-6zM3 14c0-2.8 2.2-5 5-5s5 2.2 5 5"/></svg>
           <span id="v_igralci_val"></span>
         </span>
@@ -544,8 +564,11 @@ function renderLibrary(){
     ((d.ime||'').toLowerCase().includes(q)||(d.kategorija||'').toLowerCase().includes(q)||(d.teme||'').toLowerCase().includes(q))
   );
 
+  // update count badge
+  const countEl=document.getElementById('drillCount');
+  if(countEl)countEl.textContent=filtered.length||'';
+
   if(viewMode==='list'){
-    // Remove old grid list, show/create rows container
     let grid=document.getElementById('drillList');
     grid.style.display='none';
     let rows=document.getElementById('drillListRows');
@@ -558,7 +581,7 @@ function renderLibrary(){
     rows.style.display='flex';
     if(!filtered.length){
       rows.innerHTML='';
-      grid.innerHTML=`<div class="empty"><div>${drills.length?'🔍':'⚽'}</div><p>${drills.length?'Ni rezultatov':'Še ni vaj'}</p><small>${drills.length?'Poskusi drugo iskanje':'Dodaj prvo vajo z gumbom +'}</small></div>`;
+      grid.innerHTML=`<div class="empty"><div>${drills.length?'🔍':'🏀'}</div><p>${drills.length?'Ni rezultatov':'Še ni vaj'}</p><small>${drills.length?'Poskusi drugo iskanje':'Dodaj prvo vajo z gumbom +'}</small></div>`;
       grid.style.display='block';
       rows.style.display='none';
       return;
@@ -582,17 +605,17 @@ function renderLibrary(){
   const list=document.getElementById('drillList');
   list.style.display='flex';
   if(!filtered.length){
-    list.innerHTML=`<div class="empty"><div>${drills.length?'🔍':'⚽'}</div><p>${drills.length?'Ni rezultatov':'Še ni vaj'}</p><small>${drills.length?'Poskusi drugo iskanje':'Dodaj prvo vajo z gumbom +'}</small></div>`;
+    list.innerHTML=`<div class="empty"><div>${drills.length?'🔍':'🏀'}</div><p>${drills.length?'Ni rezultatov':'Še ni vaj'}</p><small>${drills.length?'Poskusi drugo iskanje':'Dodaj prvo vajo z gumbom +'}</small></div>`;
     return;
   }
   list.innerHTML=filtered.map((d,i)=>{
-    const icon=CAT_ICON[d.kategorija]||'⚽';
+    const icon=CAT_ICON[d.kategorija]||'🏀';
     const col=CAT_COLOR[d.kategorija]||'#001e40';
     const hasImg=d.diagram&&d.diagram.length>100;
     const delay=Math.min(i*0.04,0.24);
     const imgArea=hasImg
       ?`<img class="drill-card-img-inner" src="${d.diagram}" alt="" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover">`
-      :`<div class="drill-card-img-placeholder" style="background:#e8e8ea">${icon}</div>`;
+      :`<div class="drill-card-img-placeholder">${icon}</div>`;
     return `<div class="drill-card" style="animation-delay:${delay}s" onclick="viewDrill('${d.id}')">
       <div class="drill-card-img" style="position:relative">
         ${imgArea}
