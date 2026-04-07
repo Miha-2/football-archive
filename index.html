@@ -166,7 +166,51 @@ canvas#drawCanvas{position:absolute;inset:0;width:100%;height:100%;touch-action:
 .detail-export-btn{margin:4px 16px 24px;width:calc(100% - 32px);padding:16px;border-radius:14px;background:#94f990;color:#002204;border:none;font-family:'Manrope',sans-serif;font-size:15px;font-weight:700;cursor:pointer;letter-spacing:-.01em}
 .export-btn-green{display:flex;align-items:center;gap:7px;background:#94f990;color:#002204;padding:8px 16px;border-radius:999px;font-size:13px;font-weight:700;cursor:pointer;border:none;font-family:'Inter',sans-serif;transition:transform .12s,box-shadow .12s;box-shadow:0 2px 8px rgba(0,180,0,.2)}
 .export-btn-green:active{transform:scale(.95)}
-/* login */
+/* toast */
+@keyframes toastIn{from{opacity:0;transform:translateX(-50%) translateY(16px)}to{opacity:1;transform:translateX(-50%) translateY(0)}}
+@keyframes toastOut{from{opacity:1;transform:translateX(-50%) translateY(0)}to{opacity:0;transform:translateX(-50%) translateY(8px)}}
+.toast{position:fixed;bottom:32px;left:50%;transform:translateX(-50%);background:#1a1c1e;color:white;padding:12px 20px;border-radius:14px;font-size:14px;font-weight:600;font-family:'Inter',sans-serif;z-index:200;white-space:nowrap;pointer-events:none;box-shadow:0 8px 32px rgba(0,0,0,.25);animation:toastIn .22s ease both}
+.toast.out{animation:toastOut .2s ease forwards}
+.toast.success::before{content:'✓  '}
+.toast.error::before{content:'✕  ';color:#ff6b6b}
+
+/* bottom sheet */
+@keyframes sheetIn{from{opacity:0;transform:translateY(100%)}to{opacity:1;transform:translateY(0)}}
+@keyframes sheetOut{from{opacity:1;transform:translateY(0)}to{opacity:0;transform:translateY(100%)}}
+.sheet-backdrop{position:fixed;inset:0;background:rgba(0,0,0,.4);z-index:100;display:none;backdrop-filter:blur(2px)}
+.sheet-backdrop.active{display:flex;align-items:flex-end}
+.sheet{width:100%;max-width:480px;margin:0 auto;background:white;border-radius:24px 24px 0 0;padding:12px 20px 40px;animation:sheetIn .28s cubic-bezier(.32,.72,0,1) both}
+.sheet.out{animation:sheetOut .22s ease forwards}
+.sheet-handle{width:36px;height:4px;background:#e0e0e4;border-radius:99px;margin:0 auto 20px}
+.sheet-title{font-family:'Manrope',sans-serif;font-size:18px;font-weight:800;color:#1a1c1e;margin-bottom:6px;letter-spacing:-.02em}
+.sheet-sub{font-size:14px;color:#737780;margin-bottom:24px;line-height:1.5}
+.sheet-btn{width:100%;padding:17px;border-radius:14px;border:none;font-family:'Manrope',sans-serif;font-size:16px;font-weight:700;cursor:pointer;margin-bottom:10px;transition:transform .12s}
+.sheet-btn:active{transform:scale(.98)}
+.sheet-btn-danger{background:#fff0f0;color:#c0392b}
+.sheet-btn-cancel{background:#f3f3f6;color:#1a1c1e}
+
+/* skeleton */
+@keyframes shimmer{0%{background-position:-400px 0}100%{background-position:400px 0}}
+.skeleton{background:linear-gradient(90deg,#ebebee 25%,#f5f5f8 50%,#ebebee 75%);background-size:800px 100%;animation:shimmer 1.4s ease infinite;border-radius:10px}
+.skel-card{background:white;border-radius:18px;overflow:hidden;box-shadow:0 2px 12px rgba(0,30,64,.07);margin-bottom:14px}
+.skel-img{aspect-ratio:16/9;width:100%}
+.skel-body{padding:14px 16px 16px}
+.skel-line{height:14px;margin-bottom:10px}
+.skel-line.short{width:55%}
+
+/* PDF loading overlay */
+.pdf-overlay{position:fixed;inset:0;background:rgba(0,20,40,.7);backdrop-filter:blur(6px);z-index:150;display:none;flex-direction:column;align-items:center;justify-content:center;gap:16px}
+.pdf-overlay.active{display:flex}
+.pdf-spinner{width:44px;height:44px;border:3px solid rgba(255,255,255,.2);border-top-color:#94f990;border-radius:50%;animation:spin .7s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.pdf-overlay-text{color:white;font-family:'Manrope',sans-serif;font-size:15px;font-weight:700}
+
+/* search clear button */
+.search-clear{position:absolute;right:28px;top:50%;transform:translateY(-50%);width:20px;height:20px;border-radius:50%;background:#c0c4cc;border:none;cursor:pointer;display:none;align-items:center;justify-content:center;color:white;font-size:11px;font-weight:700;line-height:1;padding:0}
+.search-clear.visible{display:flex}
+
+/* unsaved dot on save btn */
+.unsaved-dot{display:inline-block;width:7px;height:7px;background:#94f990;border-radius:50%;margin-left:6px;vertical-align:middle}
 .login-wrap{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:100dvh;padding:32px 24px;background:linear-gradient(170deg,#001020 0%,#001e40 45%,#f9f9fc 45%)}
 .login-box{width:100%;max-width:340px;display:flex;flex-direction:column;gap:14px}
 .login-logo{font-family:'Manrope',sans-serif;font-size:30px;font-weight:800;color:white;letter-spacing:-.04em;text-align:center;margin-bottom:4px}
@@ -227,7 +271,8 @@ canvas#drawCanvas{position:absolute;inset:0;width:100%;height:100%;touch-action:
     </div>
     <div class="search-wrap">
       <svg width="16" height="16" fill="none" viewBox="0 0 16 16"><circle cx="7" cy="7" r="5" stroke="currentColor" stroke-width="1.5"/><path d="m11 11 3 3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
-      <input type="text" id="searchInput" placeholder="Išči po imenu, kategoriji..." oninput="renderLibrary()">
+      <input type="text" id="searchInput" placeholder="Išči po imenu, kategoriji..." oninput="onSearchInput()">
+      <button class="search-clear" id="searchClear" onclick="clearSearch()">✕</button>
     </div>
     <div class="chips" id="chipsRow">
       <button class="chip active" onclick="setFilter('',this)">Vse vaje</button>
@@ -237,7 +282,7 @@ canvas#drawCanvas{position:absolute;inset:0;width:100%;height:100%;touch-action:
       <button class="chip" onclick="setFilter('Igralna oblika',this)">Igralna oblika</button>
     </div>
     <div class="drill-list" id="drillList"></div>
-    <div style="height:16px"></div>
+    <div style="height:100px"></div>
   </main>
   <button class="fab" onclick="newDrill()">+</button>
   
@@ -246,7 +291,7 @@ canvas#drawCanvas{position:absolute;inset:0;width:100%;height:100%;touch-action:
 <!-- EDITOR -->
 <div class="screen" id="screen-form">
   <header>
-    <button class="back-btn" onclick="goLibrary()">
+    <button class="back-btn" onclick="guardedBack(()=>{ if(editingId){const d=drills.find(x=>x.id===editingId);if(d){renderView(d);showScreen('view');}else goLibrary();}else goLibrary(); })">
       <svg width="16" height="16" fill="none" viewBox="0 0 16 16"><path d="M10 12L6 8l4-4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
       Nazaj
     </button>
@@ -435,20 +480,20 @@ canvas#drawCanvas{position:absolute;inset:0;width:100%;height:100%;touch-action:
         <img id="v_diagram" class="detail-diagram-img" src="" alt="" style="display:none">
       </div>
 
-      <div class="detail-block">
+      <div class="detail-block" id="v_block_potek">
         <div class="detail-block-label">Potek vaje</div>
         <div class="detail-block-content" id="v_potek"></div>
       </div>
-      <div class="detail-block">
+      <div class="detail-block" id="v_block_coaching">
         <div class="detail-block-label">Coaching points</div>
         <div class="detail-block-content" id="v_coaching"></div>
       </div>
       <div class="detail-row2">
-        <div class="detail-block">
+        <div class="detail-block" id="v_block_variacije">
           <div class="detail-block-label">Variacije</div>
           <div class="detail-block-content" id="v_variacije"></div>
         </div>
-        <div class="detail-block">
+        <div class="detail-block" id="v_block_nasveti">
           <div class="detail-block-label">Nasveti</div>
           <div class="detail-block-content" id="v_nasveti"></div>
         </div>
@@ -475,22 +520,113 @@ canvas#drawCanvas{position:absolute;inset:0;width:100%;height:100%;touch-action:
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+
+<!-- TOAST -->
+<div id="toast" class="toast" style="display:none"></div>
+
+<!-- DELETE CONFIRMATION SHEET -->
+<div class="sheet-backdrop" id="deleteSheet" onclick="closeDeleteSheet()">
+  <div class="sheet" onclick="event.stopPropagation()">
+    <div class="sheet-handle"></div>
+    <div class="sheet-title">Izbriši vajo?</div>
+    <div class="sheet-sub">Ta vaja bo trajno izbrisana iz zbirke. Tega dejanja ni mogoče razveljaviti.</div>
+    <button class="sheet-btn sheet-btn-danger" onclick="confirmDelete()">Izbriši vajo</button>
+    <button class="sheet-btn sheet-btn-cancel" onclick="closeDeleteSheet()">Prekliči</button>
+  </div>
+</div>
+
+<!-- UNSAVED CHANGES SHEET -->
+<div class="sheet-backdrop" id="unsavedSheet" onclick="closeUnsavedSheet(false)">
+  <div class="sheet" onclick="event.stopPropagation()">
+    <div class="sheet-handle"></div>
+    <div class="sheet-title">Nezhranjene spremembe</div>
+    <div class="sheet-sub">Imaš neshranjene spremembe. Če zapustiš, bodo izgubljene.</div>
+    <button class="sheet-btn" style="background:#001e40;color:white" onclick="closeUnsavedSheet(false);saveDrill(false)">Shrani in zapusti</button>
+    <button class="sheet-btn sheet-btn-danger" onclick="closeUnsavedSheet(true)">Zavrzi spremembe</button>
+    <button class="sheet-btn sheet-btn-cancel" onclick="closeUnsavedSheet(false)">Ostani</button>
+  </div>
+</div>
+
+<!-- PDF LOADING OVERLAY -->
+<div class="pdf-overlay" id="pdfOverlay">
+  <div class="pdf-spinner"></div>
+  <div class="pdf-overlay-text">Generiranje PDF…</div>
+</div>
 <script>
-let drills=[],currentId=null,editingId=null,activeFilter='',viewMode='grid';
+let drills=[],currentId=null,editingId=null,activeFilter='',viewMode=localStorage.getItem('viewMode')||'grid';
 let currentTool='pen',currentColor='#001e40';
 let isDrawing=false,startX,startY,snapshot;
 let canvas,ctx;
 let undoStack=[],redoStack=[];
 const MAX_UNDO=20;
-// zoom/pan state
 let vpScale=1,vpOffX=0,vpOffY=0;
 let pinchActive=false,pinchStartDist=0,pinchStartScale=1,pinchStartMidX=0,pinchStartMidY=0,pinchStartOffX=0,pinchStartOffY=0;
 let panActive=false,panStartX=0,panStartY=0,panStartOffX=0,panStartOffY=0;
+let formDirty=false;          // unsaved changes flag
+let pendingBackAction=null;   // what to do after confirming unsaved sheet
+let libraryScrollY=0;         // remembered scroll position
 const SUPA_URL='https://nyslzoavoidumfmdlpfk.supabase.co';
 const SUPA_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im55c2x6b2F2b2lkdW1mbWRscGZrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzU0OTkxNDEsImV4cCI6MjA5MTA3NTE0MX0.4yKsVk-ytTjJ2pjoqqJetsng0piQ-wj1axUpWeGOnEM';
 const sb=supabase.createClient(SUPA_URL,SUPA_KEY);
+let authMode='login';
 
-let authMode='login'; // 'login' | 'register'
+// ── Toast ─────────────────────────────────────────────────────────────────
+let toastTimer=null;
+function showToast(msg,type='success'){
+  const el=document.getElementById('toast');
+  el.className='toast '+(type||'');
+  el.textContent=msg;
+  el.style.display='block';
+  if(toastTimer)clearTimeout(toastTimer);
+  toastTimer=setTimeout(()=>{
+    el.classList.add('out');
+    setTimeout(()=>{el.style.display='none';el.classList.remove('out');},200);
+  },2600);
+}
+
+// ── Delete sheet ──────────────────────────────────────────────────────────
+function openDeleteSheet(){
+  const s=document.getElementById('deleteSheet');
+  s.classList.add('active');
+  s.querySelector('.sheet').classList.remove('out');
+}
+function closeDeleteSheet(){
+  const s=document.getElementById('deleteSheet');
+  s.querySelector('.sheet').classList.add('out');
+  setTimeout(()=>s.classList.remove('active'),220);
+}
+async function confirmDelete(){
+  closeDeleteSheet();
+  const {error}=await sb.from('drills').delete().eq('id',editingId);
+  if(error){showToast('Napaka pri brisanju','error');return;}
+  drills=drills.filter(x=>x.id!==editingId);
+  showToast('Vaja izbrisana');
+  goLibrary();
+}
+
+// ── Unsaved changes sheet ─────────────────────────────────────────────────
+function openUnsavedSheet(onDiscard){
+  pendingBackAction=onDiscard;
+  const s=document.getElementById('unsavedSheet');
+  s.classList.add('active');
+  s.querySelector('.sheet').classList.remove('out');
+}
+function closeUnsavedSheet(discard){
+  const s=document.getElementById('unsavedSheet');
+  s.querySelector('.sheet').classList.add('out');
+  setTimeout(()=>{
+    s.classList.remove('active');
+    if(discard&&pendingBackAction){pendingBackAction();pendingBackAction=null;}
+  },220);
+}
+
+// ── Form dirty tracking ───────────────────────────────────────────────────
+function markDirty(){formDirty=true;}
+function resetDirty(){formDirty=false;}
+function guardedBack(action){
+  if(formDirty){openUnsavedSheet(()=>{resetDirty();action();});}
+  else{action();}
+}
 
 function toggleAuthMode(){
   authMode=authMode==='login'?'register':'login';
@@ -532,6 +668,17 @@ function hideLoginScreen(){
 }
 
 async function loadDrills(){
+  // show skeleton
+  const list=document.getElementById('drillList');
+  list.style.display='flex';
+  list.innerHTML=Array(3).fill(0).map(()=>`
+    <div class="skel-card">
+      <div class="skel-img skeleton"></div>
+      <div class="skel-body">
+        <div class="skel-line skeleton" style="width:70%;height:16px;margin-bottom:10px"></div>
+        <div class="skel-line skeleton short" style="height:12px"></div>
+      </div>
+    </div>`).join('');
   const {data,error}=await sb.from('drills').select('*').order('created_at',{ascending:false});
   if(error){console.error(error);drills=[];}
   else drills=(data||[]).map(r=>({id:r.id,ime:r.ime,skupina:r.skupina,kategorija:r.kategorija,teme:r.teme,potek:r.potek,datum:r.datum,igralci:r.igralci,coaching:r.coaching,variacije:r.variacije,nasveti:r.nasveti,diagram:r.diagram}));
@@ -543,8 +690,22 @@ async function saveDrills(){/* no-op, replaced by per-drill saves */}
 const CAT_ICON={'Ogrevanje':'🔥','Dinamična tehnika':'⚙️','Situacijska vadba':'🧩','Igralna oblika':'🎯'};
 const CAT_COLOR={'Ogrevanje':'#f97316','Dinamična tehnika':'#3b82f6','Situacijska vadba':'#8b5cf6','Igralna oblika':'#22c55e','Prosta igra':'#a855f7'};
 
+function onSearchInput(){
+  const val=document.getElementById('searchInput').value;
+  const btn=document.getElementById('searchClear');
+  if(btn)btn.classList.toggle('visible',val.length>0);
+  renderLibrary();
+}
+function clearSearch(){
+  document.getElementById('searchInput').value='';
+  const btn=document.getElementById('searchClear');
+  if(btn)btn.classList.remove('visible');
+  renderLibrary();
+}
+
 function setViewMode(mode){
   viewMode=mode;
+  localStorage.setItem('viewMode',mode);
   document.getElementById('toggle-grid').classList.toggle('active',mode==='grid');
   document.getElementById('toggle-list').classList.toggle('active',mode==='list');
   renderLibrary();
@@ -667,75 +828,86 @@ window.addEventListener('popstate',function(e){
   const id=current?current.id.replace('screen-',''):'library';
   if(id==='view'){goLibrary();}
   else if(id==='form'){
-    // if editing go to view, if new go to library
-    if(editingId){const d=drills.find(x=>x.id===editingId);if(d){renderView(d);showScreen('view');history.go(-1);}else goLibrary();}
-    else goLibrary();
+    guardedBack(()=>{
+      if(editingId){const d=drills.find(x=>x.id===editingId);if(d){renderView(d);showScreen('view');history.go(-1);}else goLibrary();}
+      else goLibrary();
+    });
   }
   else{
-    // already at library — push state again so next back doesn't exit app
     history.pushState({screen:'library'},'',null);
   }
 });
 
 function newDrill(){
   editingId=null;
+  resetDirty();
   document.getElementById('formTitle').textContent='Nova vaja';
   document.getElementById('deleteBtn').style.display='none';
   ['ime','skupina','teme','potek','igralci','coaching','variacije','nasveti'].forEach(f=>{const el=document.getElementById('f_'+f);if(el)el.value='';});
   document.getElementById('f_kategorija').value='';
   document.getElementById('f_datum').value=new Date().toISOString().split('T')[0];
   showScreen('form');
-  setTimeout(()=>{initCanvas();clearCanvas();},60);
+  setTimeout(()=>{initCanvas();clearCanvas();attachFormDirty();},60);
 }
 
 function editDrill(){
   const d=drills.find(x=>x.id===currentId);if(!d)return;
   editingId=currentId;
+  resetDirty();
   document.getElementById('formTitle').textContent='Uredi vajo';
   document.getElementById('deleteBtn').style.display='block';
   ['ime','skupina','kategorija','teme','potek','datum','igralci','coaching','variacije','nasveti'].forEach(f=>{const el=document.getElementById('f_'+f);if(el)el.value=d[f]||'';});
   showScreen('form');
-  setTimeout(()=>{initCanvas();if(d.diagram){const img=new Image();img.onload=()=>ctx.drawImage(img,0,0,canvas.width,canvas.height);img.src=d.diagram;}else clearCanvas();},60);
+  setTimeout(()=>{initCanvas();if(d.diagram&&d.diagram.length>100){const img=new Image();img.onload=()=>{ctx.drawImage(img,0,0,canvas.width,canvas.height);resetDirty();};img.src=d.diagram;}else clearCanvas();attachFormDirty();},60);
+}
+
+function attachFormDirty(){
+  document.querySelectorAll('#screen-form input,#screen-form textarea,#screen-form select').forEach(el=>{
+    el.addEventListener('input',markDirty,{once:false});
+  });
 }
 
 async function saveDrill(andPDF){
+  const ime=document.getElementById('f_ime').value.trim();
+  if(!ime){
+    document.getElementById('f_ime').focus();
+    showToast('Vnesi ime vaje','error');
+    return;
+  }
   const btn=document.getElementById('saveBtn');
-  if(btn){btn.textContent='...';btn.disabled=true;}
+  if(btn){btn.textContent='Shranjujem…';btn.disabled=true;}
   let diagramData='';
-  if(canvas){
+  if(canvas&&!canvasIsBlank()){
     const off=document.createElement('canvas');
     off.width=canvas.width;off.height=canvas.height;
     const offCtx=off.getContext('2d');
-    offCtx.fillStyle='#ffffff';
-    offCtx.fillRect(0,0,off.width,off.height);
+    offCtx.fillStyle='#ffffff';offCtx.fillRect(0,0,off.width,off.height);
     offCtx.drawImage(canvas,0,0);
-    diagramData=off.toDataURL('image/png');
+    diagramData=off.toDataURL('image/jpeg',0.88);
   }
   const {data:{user}}=await sb.auth.getUser();
-  const row={ime:document.getElementById('f_ime').value.trim()||'Brez imena',skupina:document.getElementById('f_skupina').value,kategorija:document.getElementById('f_kategorija').value,teme:document.getElementById('f_teme').value,potek:document.getElementById('f_potek').value,datum:document.getElementById('f_datum').value,igralci:document.getElementById('f_igralci').value,coaching:document.getElementById('f_coaching').value,variacije:document.getElementById('f_variacije').value,nasveti:document.getElementById('f_nasveti').value,diagram:diagramData,user_id:user.id};
+  const row={ime,skupina:document.getElementById('f_skupina').value,kategorija:document.getElementById('f_kategorija').value,teme:document.getElementById('f_teme').value,potek:document.getElementById('f_potek').value,datum:document.getElementById('f_datum').value,igralci:document.getElementById('f_igralci').value,coaching:document.getElementById('f_coaching').value,variacije:document.getElementById('f_variacije').value,nasveti:document.getElementById('f_nasveti').value,diagram:diagramData,user_id:user.id};
   let saved;
   if(editingId){
     const {data,error}=await sb.from('drills').update(row).eq('id',editingId).select().single();
-    if(error){alert('Napaka: '+error.message);if(btn){btn.textContent='Shrani';btn.disabled=false;}return;}
+    if(error){showToast('Napaka: '+error.message,'error');if(btn){btn.textContent='Shrani';btn.disabled=false;}return;}
     saved=data;
     const i=drills.findIndex(x=>x.id===editingId);if(i>=0)drills[i]=saved;
   } else {
     const {data,error}=await sb.from('drills').insert(row).select().single();
-    if(error){alert('Napaka: '+error.message);if(btn){btn.textContent='Shrani';btn.disabled=false;}return;}
+    if(error){showToast('Napaka: '+error.message,'error');if(btn){btn.textContent='Shrani';btn.disabled=false;}return;}
     saved=data;
     drills.unshift(saved);
   }
+  resetDirty();
   if(btn){btn.textContent='Shrani';btn.disabled=false;}
   currentId=saved.id;renderView(saved);showScreen('view');
+  showToast(editingId?'Vaja posodobljena ✓':'Vaja shranjena ✓');
   if(andPDF)setTimeout(()=>doExportPDF(saved),300);
 }
 
-async function deleteDrill(){
-  if(!confirm('Izbriši vajo?'))return;
-  const {error}=await sb.from('drills').delete().eq('id',editingId);
-  if(error){alert('Napaka: '+error.message);return;}
-  drills=drills.filter(x=>x.id!==editingId);
-  goLibrary();
+function deleteDrill(){
+  openDeleteSheet();
 }
 function viewDrill(id){currentId=id;const d=drills.find(x=>x.id===id);if(!d)return;renderView(d);showScreen('view');}
 
@@ -748,15 +920,25 @@ function formatDate(s){
 
 function renderView(d){
   const kp=document.getElementById('v_kat_pill');
-  kp.textContent=d.kategorija||''; kp.style.display=d.kategorija?'':'none';
+  kp.textContent=d.kategorija||''; kp.style.display=d.kategorija?'inline-block':'none';
   const tp=document.getElementById('v_teme_pills');
   if(tp) tp.innerHTML=d.teme?d.teme.split(',').map(t=>`<span class="detail-hero-pill" style="display:inline-block">${t.trim()}</span>`).join(''):'';
   document.getElementById('v_ime').textContent=d.ime||'';
-  document.getElementById('v_potek').textContent=d.potek||'—';
-  document.getElementById('v_coaching').textContent=d.coaching||'—';
-  document.getElementById('v_variacije').textContent=d.variacije||'—';
-  document.getElementById('v_nasveti').textContent=d.nasveti||'—';
-  // meta row — skupina, datum, igralci
+
+  // show/hide content blocks based on content
+  function setBlock(blockId,contentId,val){
+    const block=document.getElementById(blockId);
+    const content=document.getElementById(contentId);
+    if(!block)return;
+    if(val){content.textContent=val;block.style.display='';}
+    else{block.style.display='none';}
+  }
+  setBlock('v_block_potek','v_potek',d.potek);
+  setBlock('v_block_coaching','v_coaching',d.coaching);
+  setBlock('v_block_variacije','v_variacije',d.variacije);
+  setBlock('v_block_nasveti','v_nasveti',d.nasveti);
+
+  // meta row
   const sm=document.getElementById('v_skupina_meta');
   const dm=document.getElementById('v_datum_meta');
   const im=document.getElementById('v_igralci_meta');
@@ -771,10 +953,24 @@ function renderView(d){
   if(d.diagram&&d.diagram.length>100){img.src=d.diagram;img.style.display='block';ph.style.display='none';}
   else{img.style.display='none';ph.style.display='flex';}
 }
-function goLibrary(){renderLibrary();showScreen('library');}
+function goLibrary(){
+  renderLibrary();
+  showScreen('library');
+  // restore scroll after render
+  requestAnimationFrame(()=>{
+    const m=document.querySelector('#screen-library main');
+    if(m)m.scrollTop=libraryScrollY;
+  });
+}
 function exportPDF(){const d=drills.find(x=>x.id===currentId);if(d)doExportPDF(d);}
 
+// Save scroll position when leaving library
+document.querySelector('#screen-library main').addEventListener('scroll',function(){
+  libraryScrollY=this.scrollTop;
+});
+
 async function doExportPDF(d){
+  document.getElementById('pdfOverlay').classList.add('active');
   const{jsPDF}=window.jspdf;
 
   // Build off-screen HTML page for rendering
@@ -855,8 +1051,10 @@ async function doExportPDF(d){
       }
     }
     pdf.save((d.ime||'vaja').replace(/\s+/g,'_')+'.pdf');
+    showToast('PDF shranjen');
   } finally {
     document.body.removeChild(el);
+    document.getElementById('pdfOverlay').classList.remove('active');
   }
 }
 
@@ -1239,6 +1437,9 @@ if('serviceWorker' in navigator){
 
 loadDrills();
 history.replaceState({screen:'library'},'',null);
+// init viewMode buttons to match saved state
+document.getElementById('toggle-grid').classList.toggle('active',viewMode==='grid');
+document.getElementById('toggle-list').classList.toggle('active',viewMode==='list');
 sb.auth.onAuthStateChange((event,session)=>{
   if(session){
     hideLoginScreen();
