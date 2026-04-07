@@ -539,8 +539,12 @@ document.getElementById('screen-view').querySelector('.detail-scroll').addEventL
   lastScrollY=y;
 });
 
-function showScreen(id){document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));document.getElementById('screen-'+id).classList.add('active');window.scrollTo(0,0);
-  // reset header when switching to view
+function showScreen(id){
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  document.getElementById('screen-'+id).classList.add('active');
+  window.scrollTo(0,0);
+  // Push history state so device back button works
+  history.pushState({screen:id},'',null);
   if(id==='view'){
     const header=document.querySelector('#screen-view header');
     if(header)header.style.transform='translateY(0)';
@@ -548,6 +552,22 @@ function showScreen(id){document.querySelectorAll('.screen').forEach(s=>s.classL
     lastScrollY=0;
   }
 }
+
+// Handle device back button
+window.addEventListener('popstate',function(e){
+  const current=document.querySelector('.screen.active');
+  const id=current?current.id.replace('screen-',''):'library';
+  if(id==='view'){goLibrary();}
+  else if(id==='form'){
+    // if editing go to view, if new go to library
+    if(editingId){const d=drills.find(x=>x.id===editingId);if(d){renderView(d);showScreen('view');history.go(-1);}else goLibrary();}
+    else goLibrary();
+  }
+  else{
+    // already at library — push state again so next back doesn't exit app
+    history.pushState({screen:'library'},'',null);
+  }
+});
 
 function newDrill(){
   editingId=null;
@@ -1110,6 +1130,7 @@ if('serviceWorker' in navigator){
 }
 
 loadDrills();
+history.replaceState({screen:'library'},'',null);
 sb.auth.onAuthStateChange((event,session)=>{
   if(session){
     hideLoginScreen();
